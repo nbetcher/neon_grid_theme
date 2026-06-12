@@ -124,7 +124,7 @@
         <item name="shapeAppearance">@style/ShapeAppearance.NeonGrid.Large</item>
     </style>
 
-    <style name="Widget.NeonGrid.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon">
+    <style name="Widget.NeonGrid.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
         <item name="backgroundTint">@color/ng_orange</item>
         <item name="iconTint">@color/ng_on_neon</item>
         <item name="android:textColor">@color/ng_on_neon</item>

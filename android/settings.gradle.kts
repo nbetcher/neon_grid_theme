@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "neon-grid"
 include(":theme")
+include(":sample")

@@ -5,6 +5,20 @@ Themes virtually every Material widget out of the box — buttons, FAB, cards, t
 checkboxes, radios, sliders, chips, tabs, app bar, bottom-nav, nav-rail, nav-drawer, snackbar,
 dialog, bottom-sheet, progress, badge, divider.
 
+## Demo
+
+[`sample/`](sample/) is a runnable demo that applies `Theme.NeonGrid` to
+[`@layout/ng_showcase`](theme/src/main/res/layout/ng_showcase.xml) — captured on an Android 14
+emulator below.
+
+| Components & actions | Controls, chips, tabs, progress |
+|:---:|:---:|
+| <img src="screenshots/showcase_top.png" width="300"> | <img src="screenshots/showcase_scrolled.png" width="300"> |
+
+```bash
+./gradlew :sample:installDebug   # build + install the demo on a running device/emulator
+```
+
 ## Install
 
 **Option A — as a module.** Copy [`theme/`](theme/) into your project, add `include(":theme")` to

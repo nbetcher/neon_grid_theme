@@ -4,6 +4,11 @@ A Tron-inspired **neon design system** — deep blue-black lit by a full neon sp
 (fuchsia · green · orange · cyan · blue · violet · red · yellow). Glowing controls, gradient
 hairlines, letter-spaced display type over terminal mono. Grid kept; scanlines dropped.
 
+<p align="center">
+  <img src="android/screenshots/showcase_top.png" width="300" alt="Neon Grid — Android demo">
+  <img src="android/screenshots/showcase_scrolled.png" width="300" alt="Neon Grid — Android demo (scrolled)">
+</p>
+
 ➡ **[INDEX.md](INDEX.md)** — every supported platform/framework.
 
 ## Available now
