@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), corner);
             }
         });
-        v.setElevation(8 * d);
+        v.setElevation(13 * d);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             v.setOutlineSpotShadowColor(color);
             v.setOutlineAmbientShadowColor(color);
