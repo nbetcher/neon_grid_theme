@@ -86,6 +86,14 @@
         <item name="android:textColor">@color/ng_text_dim</item>
     </style>
 
+    <!-- Selection-control label (switch / checkbox / radio): mono, lightly letter-spaced so it
+         shares the tech voice; pair with @color/ng_control_label so it lights when active. -->
+    <style name="TextAppearance.NeonGrid.Control" parent="TextAppearance.Material3.BodyLarge">
+        <item name="fontFamily">monospace</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
     <!-- ===== Label (uppercase, spaced — buttons, tabs, overlines) ===== -->
     <style name="TextAppearance.NeonGrid.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
         <item name="fontFamily">monospace</item>

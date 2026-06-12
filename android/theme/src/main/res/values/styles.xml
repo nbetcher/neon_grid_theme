@@ -204,8 +204,8 @@
         <item name="thumbTint">@color/ng_switch_thumb</item>
         <item name="trackTint">@color/ng_switch_track</item>
         <item name="trackDecorationTint">@color/ng_switch_track_decoration</item>
-        <item name="android:textColor">@color/ng_text</item>
-        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.BodyLarge</item>
+        <item name="android:textColor">@color/ng_control_label</item>
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control</item>
     </style>
 
     <!-- Custom neon compound-button drawables (translucent fill + glowing stroke + bright mark),
@@ -214,16 +214,16 @@
         <item name="buttonCompat">@drawable/ng_checkbox_button_spaced</item>
         <item name="android:button">@drawable/ng_checkbox_button_spaced</item>
         <item name="buttonTint">@null</item>
-        <item name="android:textColor">@color/ng_text</item>
-        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.BodyLarge</item>
+        <item name="android:textColor">@color/ng_control_label</item>
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control</item>
     </style>
 
     <style name="Widget.NeonGrid.RadioButton" parent="Widget.Material3.CompoundButton.RadioButton">
         <item name="buttonCompat">@drawable/ng_radio_button_spaced</item>
         <item name="android:button">@drawable/ng_radio_button_spaced</item>
         <item name="buttonTint">@null</item>
-        <item name="android:textColor">@color/ng_text</item>
-        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.BodyLarge</item>
+        <item name="android:textColor">@color/ng_control_label</item>
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control</item>
     </style>
 
     <!-- =====================================================================
@@ -420,11 +420,14 @@
     <!-- =====================================================================
          SEEKBAR / RATINGBAR  — platform widgets, tinted to the roles.
          ===================================================================== -->
+    <!-- SeekBar shares the accent with Slider so all "drag a value" controls read alike. AppCompat
+         tints SeekBar from colorControlActivated, so recolor via the overlay below (apply it with
+         android:theme on the SeekBar) — view/style tints alone lose to colorControlActivated. -->
     <style name="Widget.NeonGrid.SeekBar" parent="Widget.AppCompat.SeekBar">
-        <item name="android:progressTint">?attr/colorPrimary</item>
         <item name="android:progressBackgroundTint">@color/ng_surface_higher</item>
-        <item name="android:thumbTint">?attr/colorPrimary</item>
-        <item name="android:colorControlActivated">?attr/colorPrimary</item>
+    </style>
+    <style name="ThemeOverlay.NeonGrid.SeekBar" parent="">
+        <item name="colorControlActivated">?attr/ngAccent</item>
     </style>
     <!-- Interactive RatingBar tints the platform star (RatingBar only tiles BitmapDrawables, not
          vectors). For a crisp neon display rating, lay out @drawable/ng_star_filled / ng_star_empty
