@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stat-value accent bar: cyan -> blue (the source's metric gradient). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:type="linear"
+        android:angle="0"
+        android:startColor="@color/ng_cyan"
+        android:endColor="@color/ng_blue" />
+    <corners android:radius="2dp" />
+</shape>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Live status dot. Pair with elevation + outlineSpotShadowColor for the glow. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/ng_green" />
+    <size android:width="10dp" android:height="10dp" />
+</shape>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Brand fill (logo tiles, hero icons): diagonal cyan -> violet. Use dark content on top. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:type="linear"
+        android:angle="315"
+        android:startColor="@color/ng_cyan"
+        android:endColor="@color/ng_violet" />
+    <corners android:radius="12dp" />
+</shape>
