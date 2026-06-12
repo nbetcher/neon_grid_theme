@@ -211,16 +211,16 @@
     <!-- Custom neon compound-button drawables (translucent fill + glowing stroke + bright mark),
          buttonTint disabled so the drawables' own theme-attr colors render. -->
     <style name="Widget.NeonGrid.CheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
-        <item name="buttonCompat">@drawable/ng_checkbox_button</item>
-        <item name="android:button">@drawable/ng_checkbox_button</item>
+        <item name="buttonCompat">@drawable/ng_checkbox_button_spaced</item>
+        <item name="android:button">@drawable/ng_checkbox_button_spaced</item>
         <item name="buttonTint">@null</item>
         <item name="android:textColor">@color/ng_text</item>
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.BodyLarge</item>
     </style>
 
     <style name="Widget.NeonGrid.RadioButton" parent="Widget.Material3.CompoundButton.RadioButton">
-        <item name="buttonCompat">@drawable/ng_radio_button</item>
-        <item name="android:button">@drawable/ng_radio_button</item>
+        <item name="buttonCompat">@drawable/ng_radio_button_spaced</item>
+        <item name="android:button">@drawable/ng_radio_button_spaced</item>
         <item name="buttonTint">@null</item>
         <item name="android:textColor">@color/ng_text</item>
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.BodyLarge</item>
@@ -426,6 +426,9 @@
         <item name="android:thumbTint">?attr/colorPrimary</item>
         <item name="android:colorControlActivated">?attr/colorPrimary</item>
     </style>
+    <!-- Interactive RatingBar tints the platform star (RatingBar only tiles BitmapDrawables, not
+         vectors). For a crisp neon display rating, lay out @drawable/ng_star_filled / ng_star_empty
+         as a row of ImageViews instead — see @layout/ng_showcase. -->
     <style name="Widget.NeonGrid.RatingBar" parent="Widget.AppCompat.RatingBar">
         <item name="android:progressTint">?attr/ngAccent</item>
         <item name="android:secondaryProgressTint">@color/ng_outline</item>
