@@ -1,6 +1,6 @@
 # Neon Grid
 
-A Tron-inspired **neon design system** — a deep blue-black substrate lit by a full spectrum of
+A **neon design system** inspired by a certain 80's film with "The Grid" — a deep blue-black substrate lit by a full spectrum of
 neon: fuchsia, green, orange, cyan, blue, violet, red, yellow. Glowing strokes, gradient hairlines,
 letter-spaced display type over terminal mono. (Grid: yes. Scanlines: intentionally omitted.)
 
