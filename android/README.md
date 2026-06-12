@@ -1,9 +1,14 @@
 # Neon Grid — Android (Material 3)
 
-A complete, drop-in **Material 3** theme. Dark substrate, full neon spectrum, glowing controls.
-Themes virtually every Material widget out of the box — buttons, FAB, cards, text fields, switches,
-checkboxes, radios, sliders, chips, tabs, app bar, bottom-nav, nav-rail, nav-drawer, snackbar,
-dialog, bottom-sheet, progress, badge, divider.
+A complete, drop-in **Material 3** theme. Dark substrate, full neon spectrum, glowing controls,
+and **one-knob recoloring** — every accent derives from a handful of theme attributes (see
+[Color roles & customizing](#color-roles--customizing)).
+
+Themes virtually every Material + platform widget out of the box — buttons, segmented/toggle
+groups, FAB & extended FAB, cards, text fields, exposed dropdowns, switches, checkboxes, radios,
+sliders, seek bars, rating bars, spinners, chips, tabs, app bar, bottom app bar, collapsing
+toolbar, bottom-nav, nav-rail, nav-drawer, popup menus, tooltips, snackbar, dialog, bottom-sheet,
+date/time pickers, search bar/view, progress, badge, divider.
 
 ## Demo
 
@@ -11,9 +16,9 @@ dialog, bottom-sheet, progress, badge, divider.
 [`@layout/ng_showcase`](theme/src/main/res/layout/ng_showcase.xml) — captured on an Android 14
 emulator below.
 
-| Components & actions | Controls, chips, tabs, progress |
-|:---:|:---:|
-| <img src="screenshots/showcase_top.png" width="300"> | <img src="screenshots/showcase_scrolled.png" width="300"> |
+| Buttons · borders · titles | Selection controls | Chips · tabs · segmented · more |
+|:---:|:---:|:---:|
+| <img src="screenshots/showcase_top.png" width="240"> | <img src="screenshots/showcase_mid.png" width="240"> | <img src="screenshots/showcase_scrolled.png" width="240"> |
 
 ```bash
 ./gradlew :sample:installDebug   # build + install the demo on a running device/emulator
@@ -49,22 +54,39 @@ Variants are opt-in via `style=`:
 
 A full reference layout lives at `@layout/ng_showcase` — set it as a content view to see everything.
 
-## Color roles
+## Color roles & customizing
 
-| Material role | Color | | Material role | Color |
-|---|---|---|---|---|
-| `colorPrimary` | fuchsia | | `colorTertiary` | orange |
-| `colorSecondary` | green | | `colorError` | red |
+Every widget — fill, stroke, label, border, title, switch, checkbox, radio, indicator — derives from
+**four theme attributes** through color-state-lists that reference them with `android:alpha`. Override
+any of them in a theme that extends `Theme.NeonGrid` and the **whole system recolors**, translucent
+neon fills and glowing strokes included. No per-widget restyling.
 
-`cyan` (info), `blue` (metric gradients), `violet` (brand gradients) and `yellow` (caution) are
-applied directly by the styles and gradient drawables (`ng_gradient_brand`, `ng_gradient_value`,
-`ng_accent_line_*`). Raw tokens are `@color/ng_fuchsia`, `@color/ng_green`, `@color/ng_orange`,
-`@color/ng_cyan`, `@color/ng_blue`, `@color/ng_violet`, `@color/ng_red`, `@color/ng_yellow`.
+| Attribute | Default | Drives |
+|---|---|---|
+| `colorPrimary` | cyan | default action, **borders, titles**, fields, switch, checkbox, radio, nav, links, linear progress, badge |
+| `colorSecondary` | green | secondary action, tabs, positive / snackbar action |
+| `colorTertiary` | fuchsia | tertiary action, circular progress |
+| `ngAccent` | orange | FAB, slider, rating, the Accent button |
+| `colorError` | red | danger action, field errors |
+
+```xml
+<!-- Recolor the entire theme from one place: -->
+<style name="Theme.MyApp" parent="Theme.NeonGrid">
+    <item name="colorPrimary">@color/my_violet</item>  <!-- borders, titles, switches, checks… all follow -->
+    <item name="ngAccent">@color/my_amber</item>        <!-- FAB + slider follow -->
+</style>
+```
+
+`blue` / `violet` / `yellow` stay direct in the gradient drawables (`ng_gradient_brand`,
+`ng_gradient_value`, `ng_accent_line_*`) for metric/brand washes and caution. Raw tokens are
+`@color/ng_fuchsia`, `@color/ng_green`, `@color/ng_orange`, `@color/ng_cyan`, `@color/ng_blue`,
+`@color/ng_violet`, `@color/ng_red`, `@color/ng_yellow`.
 
 ## Button variants
 
-`Widget.NeonGrid.Button` (fuchsia, default) · `.Secondary` (green) · `.Tertiary` (orange) ·
-`.Info` (cyan) · `.Danger` (red) · `.Ghost` · `.Outlined` · `.Text` · `.Tonal` · `.Icon` · `.Small`.
+`Widget.NeonGrid.Button` (cyan, default) · `.Secondary` (green) · `.Tertiary` (fuchsia) ·
+`.Accent` (orange) · `.Danger` (red) · `.Ghost` · `.Outlined` · `.Text` · `.Tonal` · `.Icon` ·
+`.Small` · `.Segmented` (toggle-group children).
 
 Status pills: `Widget.NeonGrid.Chip.Status.{Success,Info,Warning,Danger,Neutral}`.
 

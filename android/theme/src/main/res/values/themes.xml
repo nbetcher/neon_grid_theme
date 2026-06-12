@@ -1,35 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Neon Grid — the theme. Dark Material 3 lit by the full source spectrum.
-  Role map:  primary=fuchsia · secondary=green · tertiary=orange · error=red
-             (cyan/blue/violet/yellow are used directly by styles & drawables for info,
-              metrics, brand gradients and caution — see styles.xml / drawables).
+  Role map:  primary=cyan · secondary=green · tertiary=fuchsia · accent=orange · error=red
+             Override colorPrimary / colorSecondary / colorTertiary / ngAccent in your own
+             theme and the WHOLE system recolors — every fill, stroke, label, border and title
+             derives from them (via theme-attr color state lists). blue/violet/yellow stay
+             direct (metric & brand gradients, caution) — see styles.xml / drawables.
 -->
 <resources>
 
     <style name="Theme.NeonGrid" parent="Theme.Material3.Dark.NoActionBar">
 
         <!-- ===== Color roles ===== -->
-        <item name="colorPrimary">@color/ng_fuchsia</item>
+        <item name="colorPrimary">@color/ng_cyan</item>
         <item name="colorOnPrimary">@color/ng_on_neon</item>
         <item name="colorPrimaryContainer">@color/ng_surface_higher</item>
-        <item name="colorOnPrimaryContainer">@color/ng_fuchsia</item>
-        <item name="colorPrimaryInverse">@color/ng_fuchsia</item>
+        <item name="colorOnPrimaryContainer">@color/ng_cyan</item>
+        <item name="colorPrimaryInverse">@color/ng_cyan</item>
 
         <item name="colorSecondary">@color/ng_green</item>
         <item name="colorOnSecondary">@color/ng_on_neon</item>
         <item name="colorSecondaryContainer">@color/ng_surface_high</item>
         <item name="colorOnSecondaryContainer">@color/ng_green</item>
 
-        <item name="colorTertiary">@color/ng_orange</item>
+        <item name="colorTertiary">@color/ng_fuchsia</item>
         <item name="colorOnTertiary">@color/ng_on_neon</item>
         <item name="colorTertiaryContainer">@color/ng_surface_high</item>
-        <item name="colorOnTertiaryContainer">@color/ng_orange</item>
+        <item name="colorOnTertiaryContainer">@color/ng_fuchsia</item>
 
         <item name="colorError">@color/ng_red</item>
         <item name="colorOnError">@color/ng_on_neon</item>
         <item name="colorErrorContainer">@color/ng_surface_high</item>
         <item name="colorOnErrorContainer">@color/ng_red</item>
+
+        <!-- 4th brand accent (FAB, slider, the Accent button) — Material has no role slot for
+             a 4th color, so Neon Grid declares one. Override it to recolor those accents. -->
+        <item name="ngAccent">@color/ng_orange</item>
 
         <!-- ===== Surfaces / background ===== -->
         <item name="android:colorBackground">@color/ng_void</item>
@@ -54,7 +60,7 @@
         <item name="elevationOverlayEnabled">false</item>
 
         <!-- Legacy control colors -->
-        <item name="colorControlActivated">@color/ng_fuchsia</item>
+        <item name="colorControlActivated">@color/ng_cyan</item>
         <item name="colorControlNormal">@color/ng_text_dim</item>
         <item name="colorControlHighlight">@color/ng_ripple_light</item>
         <item name="android:textColorPrimary">@color/ng_text</item>
@@ -122,6 +128,20 @@
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.NeonGrid.BottomSheetDialog</item>
         <item name="badgeStyle">@style/Widget.NeonGrid.Badge</item>
         <item name="materialDividerStyle">@style/Widget.NeonGrid.Divider</item>
+
+        <!-- ===== More OOTB widgets — wire the rest of what Android exposes ===== -->
+        <item name="bottomAppBarStyle">@style/Widget.NeonGrid.BottomAppBar</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Widget.NeonGrid.CollapsingToolbar</item>
+        <item name="android:seekBarStyle">@style/Widget.NeonGrid.SeekBar</item>
+        <item name="android:ratingBarStyle">@style/Widget.NeonGrid.RatingBar</item>
+        <item name="android:spinnerStyle">@style/Widget.NeonGrid.Spinner</item>
+        <item name="popupMenuStyle">@style/Widget.NeonGrid.PopupMenu</item>
+        <item name="listPopupWindowStyle">@style/Widget.NeonGrid.ListPopupWindow</item>
+        <item name="autoCompleteTextViewStyle">@style/Widget.NeonGrid.AutoCompleteTextView</item>
+        <item name="materialSearchBarStyle">@style/Widget.NeonGrid.SearchBar</item>
+        <item name="materialSearchViewStyle">@style/Widget.NeonGrid.SearchView</item>
+        <item name="materialTimePickerTheme">@style/ThemeOverlay.NeonGrid.TimePicker</item>
+        <item name="materialCalendarTheme">@style/ThemeOverlay.NeonGrid.DatePicker</item>
     </style>
 
     <!-- Flat-background variant (no radial glow) for embedded surfaces. -->

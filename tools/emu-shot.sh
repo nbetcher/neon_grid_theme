@@ -3,7 +3,7 @@
 set -uo pipefail
 source "$HOME/.pebble-build-env"
 APK=/mnt/d/Documents/Projects/NeonGrid/android/sample/build/outputs/apk/debug/sample-debug.apk
-OUT=/mnt/d/Documents/Projects/NeonGrid/screenshots
+OUT=/mnt/d/Documents/Projects/NeonGrid/android/screenshots
 mkdir -p "$OUT"
 
 echo ">> wait-for-device"
@@ -24,15 +24,22 @@ echo ">> install"
 adb install -r -g "$APK" 2>&1 | tail -2
 
 echo ">> launch"
+adb shell am force-stop com.nickbether.neongrid.sample >/dev/null 2>&1 || true
 adb shell am start -n com.nickbether.neongrid.sample/.MainActivity 2>&1 | tail -2
 sleep 5
 
-echo ">> screencap top"
+echo ">> screencap top"   # title, stat cards, action buttons
 adb exec-out screencap -p > "$OUT/showcase_top.png"
 ls -l "$OUT/showcase_top.png"
 
-adb shell input swipe 540 1900 540 500 300; sleep 1
-adb shell input swipe 540 1900 540 500 300; sleep 2
+# Mid: the Provision panel — switch, checkbox, radio, slider.
+adb shell input swipe 540 1900 540 600 400; sleep 1
+echo ">> screencap mid"
+adb exec-out screencap -p > "$OUT/showcase_mid.png"
+ls -l "$OUT/showcase_mid.png"
+
+# Scrolled: Filters (chips, tabs, progress) + Controls (segmented, dropdown, seek, rating).
+adb shell input swipe 540 1900 540 500 350; sleep 2
 echo ">> screencap scrolled"
 adb exec-out screencap -p > "$OUT/showcase_scrolled.png"
 ls -l "$OUT/showcase_scrolled.png"

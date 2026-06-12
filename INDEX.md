@@ -23,10 +23,10 @@ Each platform implements the same shared design tokens below, idiomatically.
 
 | Token | Hex | Typical role |
 |---|---|---|
-| Fuchsia | `#FF2DAA` | brand / primary |
+| Cyan | `#00D4FF` | brand / primary |
 | Green | `#00FF88` | positive / secondary |
-| Orange | `#FF8A00` | action / tertiary |
-| Cyan | `#00D4FF` | info / accent |
+| Fuchsia | `#FF2DAA` | tertiary |
+| Orange | `#FF8A00` | action / accent |
 | Blue | `#0088FF` | metric gradients |
 | Violet | `#7B2FFF` | brand gradients |
 | Red | `#FF3355` | danger / error |
