@@ -7,14 +7,15 @@
   colorPrimary / colorSecondary / colorTertiary / ngAccent (see attrs.xml) in a theme that extends
   Theme.NeonGrid and the entire system recolors — translucent fills and glowing strokes included.
 
-  Role usage:
-    primary   (cyan)    → default action, borders, titles, switch, checkbox, radio, fields, nav, links
-    secondary (green)   → secondary action, tabs, positive/snackbar action
-    tertiary  (fuchsia) → tertiary action, circular progress
-    accent    (orange)  → FAB, slider, the Accent button
-    error     (red)     → danger action, field errors
-  Status pills (success/info/warning/danger) keep fixed semantic hues; blue/violet/yellow remain
-  direct in gradient drawables. Spacing is a healthy medium: 48dp targets, 20dp button padding.
+  Role usage — each widget mapped to Material 3's default color role:
+    primary   (cyan)    → buttons, switch, checkbox, radio, text fields, slider, seek bar, FAB,
+                          tabs, linear + circular progress, snackbar/dialog actions, borders, titles
+    secondary (green)   → tonal button, filter chips, segmented buttons, spinner, navigation
+    tertiary  (fuchsia) → the Tertiary button variant
+    accent    (orange)  → the Accent button variant
+    error     (red)     → danger button, field errors, badge
+  Status pills (success/info/warning/danger) and the rating stars keep fixed semantic hues.
+  Spacing is a healthy medium: 48dp targets, 20dp button padding.
 -->
 <resources>
 
@@ -112,9 +113,9 @@
     <style name="Widget.NeonGrid.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
         <item name="backgroundTint">@color/ng_surface_higher</item>
-        <item name="android:textColor">@color/ng_label_primary</item>
-        <item name="iconTint">@color/ng_label_primary</item>
-        <item name="rippleColor">@color/ng_fill_primary</item>
+        <item name="android:textColor">@color/ng_label_secondary</item>
+        <item name="iconTint">@color/ng_label_secondary</item>
+        <item name="rippleColor">@color/ng_fill_secondary</item>
         <item name="cornerRadius">8dp</item>
         <item name="android:minHeight">48dp</item>
     </style>
@@ -125,26 +126,26 @@
     </style>
 
     <!-- =====================================================================
-         FAB  — solid accent beacon with a colored glow (override ngAccent to recolor).
+         FAB  — solid primary beacon with a colored glow (Material 3 FAB = primary).
          ===================================================================== -->
     <style name="Widget.NeonGrid.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
-        <item name="backgroundTint">?attr/ngAccent</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
         <item name="tint">@color/ng_on_neon</item>
         <item name="rippleColor">@color/ng_ripple_light</item>
         <item name="elevation">6dp</item>
-        <item name="android:outlineSpotShadowColor">?attr/ngAccent</item>
-        <item name="android:outlineAmbientShadowColor">?attr/ngAccent</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorPrimary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorPrimary</item>
         <item name="shapeAppearance">@style/ShapeAppearance.NeonGrid.Large</item>
     </style>
 
     <style name="Widget.NeonGrid.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
-        <item name="backgroundTint">?attr/ngAccent</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
         <item name="iconTint">@color/ng_on_neon</item>
         <item name="android:textColor">@color/ng_on_neon</item>
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
         <item name="rippleColor">@color/ng_ripple_light</item>
         <item name="elevation">6dp</item>
-        <item name="android:outlineSpotShadowColor">?attr/ngAccent</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorPrimary</item>
     </style>
 
     <!-- =====================================================================
@@ -227,20 +228,21 @@
     </style>
 
     <!-- =====================================================================
-         SLIDER  — accent track, glowing accent halo.
+         SLIDER  — primary track, glowing primary halo (Material 3 Slider = primary).
          ===================================================================== -->
     <style name="Widget.NeonGrid.Slider" parent="Widget.Material3.Slider">
-        <item name="trackColorActive">?attr/ngAccent</item>
+        <item name="trackColorActive">?attr/colorPrimary</item>
         <item name="trackColorInactive">@color/ng_surface_higher</item>
-        <item name="thumbColor">?attr/ngAccent</item>
-        <item name="haloColor">@color/ng_fill_accent</item>
+        <item name="thumbColor">?attr/colorPrimary</item>
+        <item name="haloColor">@color/ng_fill_primary</item>
         <item name="tickColorActive">@color/ng_on_neon</item>
         <item name="tickColorInactive">@color/ng_text_dim</item>
         <item name="trackHeight">4dp</item>
     </style>
 
     <!-- =====================================================================
-         CHIPS  — filter chips read primary; status pills keep fixed semantic hues.
+         CHIPS  — filter chips read secondary (M3 selected chip = secondaryContainer); status
+         pills keep fixed semantic hues.
          ===================================================================== -->
     <style name="Widget.NeonGrid.Chip" parent="Widget.Material3.Chip.Filter">
         <item name="chipBackgroundColor">@color/ng_chip_bg</item>
@@ -248,8 +250,8 @@
         <item name="chipStrokeWidth">1dp</item>
         <item name="android:textColor">@color/ng_chip_text</item>
         <item name="chipIconTint">@color/ng_chip_text</item>
-        <item name="checkedIconTint">?attr/colorPrimary</item>
-        <item name="rippleColor">@color/ng_fill_primary</item>
+        <item name="checkedIconTint">?attr/colorSecondary</item>
+        <item name="rippleColor">@color/ng_fill_secondary</item>
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelMedium</item>
         <item name="chipMinHeight">32dp</item>
     </style>
@@ -296,11 +298,11 @@
     <style name="Widget.NeonGrid.Button.Segmented" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelMedium</item>
         <item name="backgroundTint">@color/ng_segmented_bg</item>
-        <item name="strokeColor">@color/ng_stroke_primary</item>
+        <item name="strokeColor">@color/ng_stroke_secondary</item>
         <item name="strokeWidth">1dp</item>
         <item name="android:textColor">@color/ng_segmented_text</item>
         <item name="iconTint">@color/ng_segmented_text</item>
-        <item name="rippleColor">@color/ng_fill_primary</item>
+        <item name="rippleColor">@color/ng_fill_secondary</item>
         <item name="android:minHeight">44dp</item>
     </style>
 
@@ -337,10 +339,10 @@
     </style>
 
     <!-- =====================================================================
-         NAVIGATION  — bottom nav, rail, drawer (all read primary).
+         NAVIGATION  — bottom nav, rail, drawer (M3 active indicator = secondaryContainer).
          ===================================================================== -->
     <style name="Widget.NeonGrid.NavigationActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
-        <item name="android:color">@color/ng_fill_primary</item>
+        <item name="android:color">@color/ng_fill_secondary</item>
         <item name="marginHorizontal">8dp</item>
     </style>
 
@@ -349,7 +351,7 @@
         <item name="itemTextColor">@color/ng_nav_item</item>
         <item name="itemIconTint">@color/ng_nav_item</item>
         <item name="itemActiveIndicatorStyle">@style/Widget.NeonGrid.NavigationActiveIndicator</item>
-        <item name="itemRippleColor">@color/ng_fill_primary</item>
+        <item name="itemRippleColor">@color/ng_fill_secondary</item>
         <item name="itemTextAppearanceActiveBoldEnabled">true</item>
         <item name="elevation">0dp</item>
     </style>
@@ -359,7 +361,7 @@
         <item name="itemTextColor">@color/ng_nav_item</item>
         <item name="itemIconTint">@color/ng_nav_item</item>
         <item name="itemActiveIndicatorStyle">@style/Widget.NeonGrid.NavigationActiveIndicator</item>
-        <item name="itemRippleColor">@color/ng_fill_primary</item>
+        <item name="itemRippleColor">@color/ng_fill_secondary</item>
     </style>
 
     <style name="Widget.NeonGrid.NavigationView" parent="Widget.Material3.NavigationView">
@@ -367,25 +369,25 @@
         <item name="itemTextColor">@color/ng_nav_item</item>
         <item name="itemIconTint">@color/ng_nav_item</item>
         <item name="itemTextAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
-        <item name="itemRippleColor">@color/ng_fill_primary</item>
+        <item name="itemRippleColor">@color/ng_fill_secondary</item>
     </style>
 
     <!-- =====================================================================
-         TABS  — secondary (green) underline indicator.
+         TABS  — primary underline indicator (Material 3 tabs = primary).
          ===================================================================== -->
     <style name="Widget.NeonGrid.TabLayout" parent="Widget.Material3.TabLayout">
         <item name="android:background">@color/ng_abyss</item>
-        <item name="tabIndicatorColor">?attr/colorSecondary</item>
+        <item name="tabIndicatorColor">?attr/colorPrimary</item>
         <item name="tabIndicatorHeight">2dp</item>
         <item name="tabIndicatorFullWidth">false</item>
         <item name="tabTextColor">@color/ng_tab_text</item>
-        <item name="tabSelectedTextColor">?attr/colorSecondary</item>
-        <item name="tabRippleColor">@color/ng_fill_secondary</item>
+        <item name="tabSelectedTextColor">?attr/colorPrimary</item>
+        <item name="tabRippleColor">@color/ng_fill_primary</item>
         <item name="tabTextAppearance">@style/TextAppearance.NeonGrid.LabelMedium</item>
     </style>
 
     <!-- =====================================================================
-         SNACKBAR  — dark surface, secondary action.
+         SNACKBAR  — dark surface, primary action.
          ===================================================================== -->
     <style name="Widget.NeonGrid.Snackbar" parent="Widget.Material3.Snackbar">
         <item name="backgroundTint">@color/ng_surface_higher</item>
@@ -397,15 +399,15 @@
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.BodyMedium</item>
     </style>
     <style name="Widget.NeonGrid.Snackbar.Button" parent="Widget.Material3.Button.TextButton.Snackbar">
-        <item name="android:textColor">?attr/colorSecondary</item>
-        <item name="rippleColor">@color/ng_fill_secondary</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="rippleColor">@color/ng_fill_primary</item>
     </style>
 
     <!-- =====================================================================
-         PROGRESS  — circular tertiary, linear primary.
+         PROGRESS  — circular + linear primary (Material 3 progress = primary).
          ===================================================================== -->
     <style name="Widget.NeonGrid.CircularProgress" parent="Widget.Material3.CircularProgressIndicator">
-        <item name="indicatorColor">?attr/colorTertiary</item>
+        <item name="indicatorColor">?attr/colorPrimary</item>
         <item name="trackColor">@color/ng_surface_higher</item>
         <item name="trackThickness">3dp</item>
         <item name="indicatorSize">36dp</item>
@@ -420,20 +422,20 @@
     <!-- =====================================================================
          SEEKBAR / RATINGBAR  — platform widgets, tinted to the roles.
          ===================================================================== -->
-    <!-- SeekBar shares the accent with Slider so all "drag a value" controls read alike. AppCompat
-         tints SeekBar from colorControlActivated, so recolor via the overlay below (apply it with
-         android:theme on the SeekBar) — view/style tints alone lose to colorControlActivated. -->
+    <!-- SeekBar = primary, like Slider (Material colorControlActivated). AppCompat tints SeekBar from
+         colorControlActivated, so recolor via the overlay below (apply it with android:theme on the
+         SeekBar) — view/style tints alone lose to colorControlActivated. -->
     <style name="Widget.NeonGrid.SeekBar" parent="Widget.AppCompat.SeekBar">
         <item name="android:progressBackgroundTint">@color/ng_surface_higher</item>
     </style>
     <style name="ThemeOverlay.NeonGrid.SeekBar" parent="">
-        <item name="colorControlActivated">?attr/ngAccent</item>
+        <item name="colorControlActivated">?attr/colorPrimary</item>
     </style>
     <!-- Interactive RatingBar tints the platform star (RatingBar only tiles BitmapDrawables, not
          vectors). For a crisp neon display rating, lay out @drawable/ng_star_filled / ng_star_empty
          as a row of ImageViews instead — see @layout/ng_showcase. -->
     <style name="Widget.NeonGrid.RatingBar" parent="Widget.AppCompat.RatingBar">
-        <item name="android:progressTint">?attr/ngAccent</item>
+        <item name="android:progressTint">@color/ng_yellow</item>
         <item name="android:secondaryProgressTint">@color/ng_outline</item>
         <item name="android:progressBackgroundTint">@color/ng_surface_higher</item>
     </style>
@@ -504,8 +506,8 @@
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.TitleLarge</item>
     </style>
     <style name="Widget.NeonGrid.Dialog.Button.Positive" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">?attr/colorSecondary</item>
-        <item name="rippleColor">@color/ng_fill_secondary</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="rippleColor">@color/ng_fill_primary</item>
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
     </style>
     <style name="Widget.NeonGrid.Dialog.Button.Neutral" parent="Widget.Material3.Button.TextButton.Dialog">
@@ -556,10 +558,10 @@
     </style>
 
     <!-- =====================================================================
-         BADGE  — primary count overlay.
+         BADGE  — error count overlay (Material 3 badge = error).
          ===================================================================== -->
     <style name="Widget.NeonGrid.Badge" parent="Widget.Material3.Badge">
-        <item name="backgroundColor">?attr/colorPrimary</item>
+        <item name="backgroundColor">?attr/colorError</item>
         <item name="badgeTextColor">@color/ng_on_neon</item>
     </style>
 

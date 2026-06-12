@@ -61,13 +61,17 @@ Every widget — fill, stroke, label, border, title, switch, checkbox, radio, in
 any of them in a theme that extends `Theme.NeonGrid` and the **whole system recolors**, translucent
 neon fills and glowing strokes included. No per-widget restyling.
 
-| Attribute | Default | Drives |
+Widgets follow **Material 3's default color role** for each component, recolored to the neon palette:
+
+| Attribute | Default | Drives (Material 3 role per widget) |
 |---|---|---|
-| `colorPrimary` | cyan | default action, **borders, titles**, fields, switch, checkbox, radio, nav, links, linear progress, badge |
-| `colorSecondary` | green | secondary action, tabs, positive / snackbar action |
-| `colorTertiary` | fuchsia | tertiary action, circular progress |
-| `ngAccent` | orange | FAB, slider, rating, the Accent button |
-| `colorError` | red | danger action, field errors |
+| `colorPrimary` | cyan | buttons, switch, checkbox, radio, text fields, slider, seek bar, FAB, tabs, linear + circular progress, snackbar/dialog actions, **borders, titles** |
+| `colorSecondary` | green | tonal button, filter chips, segmented buttons, spinner, navigation (bar / rail / drawer) |
+| `colorTertiary` | fuchsia | the `.Tertiary` button variant |
+| `ngAccent` | orange | the `.Accent` button variant |
+| `colorError` | red | `.Danger` button, field errors, badge |
+
+Status pills and the **rating stars** (neon yellow with a glow halo) keep fixed semantic hues.
 
 ```xml
 <!-- Recolor the entire theme from one place: -->
