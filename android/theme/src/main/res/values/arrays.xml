@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Demo entries for the showcase Spinner. -->
+    <string-array name="ng_demo_roles">
+        <item>Administrator</item>
+        <item>Staff</item>
+        <item>Guest</item>
+    </string-array>
+</resources>

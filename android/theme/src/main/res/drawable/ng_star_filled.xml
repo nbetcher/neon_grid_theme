@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Lit star: solid accent (follows ngAccent). -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="26dp"
-    android:height="26dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="?attr/ngAccent"
-        android:pathData="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z" />
-</vector>
+<!-- Lit star with a strong neon-yellow glow: a radial halo behind the solid star core. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="17dp"
+                android:startColor="#B3FFDD00"
+                android:centerColor="#40FFDD00"
+                android:endColor="#00FFDD00" />
+            <size android:width="34dp" android:height="34dp" />
+        </shape>
+    </item>
+    <item
+        android:width="22dp"
+        android:height="22dp"
+        android:gravity="center"
+        android:drawable="@drawable/ng_star_core" />
+</layer-list>

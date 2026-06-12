@@ -448,10 +448,16 @@
     <style name="Widget.NeonGrid.ListPopupWindow" parent="Widget.Material3.PopupMenu.ListPopupWindow">
         <item name="android:popupBackground">@drawable/ng_popup_background</item>
     </style>
-    <style name="Widget.NeonGrid.Spinner" parent="Widget.AppCompat.Spinner.Underlined">
+    <!-- Custom AA box (no jagged underline/bitmap caret); secondary role per the widget color map. -->
+    <style name="Widget.NeonGrid.Spinner" parent="Widget.AppCompat.Spinner">
+        <item name="android:background">@drawable/ng_spinner_background</item>
         <item name="android:popupBackground">@drawable/ng_popup_background</item>
         <item name="android:textColor">@color/ng_text</item>
-        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">36dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:popupElevation">8dp</item>
     </style>
     <style name="Widget.NeonGrid.ExposedDropdownMenu" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="materialThemeOverlay">@style/ThemeOverlay.NeonGrid.TextInput</item>

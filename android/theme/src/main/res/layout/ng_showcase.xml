@@ -205,14 +205,19 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- ===== Panel: inputs + selection ===== -->
+        <!-- clip flags off so the focused/error field glow can spill into the card padding. -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical">
 
                 <TextView
@@ -223,6 +228,7 @@
                     android:textColor="?attr/colorPrimary" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/ng_field_tag"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -230,6 +236,7 @@
                     app:helperText="Hex, e.g. 0x1A2B3C">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/ng_input_tag"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -495,6 +502,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
+                    android:text="ROLE"
+                    android:textAppearance="@style/TextAppearance.NeonGrid.Overline" />
+
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:entries="@array/ng_demo_roles" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
                     android:text="SENSITIVITY"
                     android:textAppearance="@style/TextAppearance.NeonGrid.Overline" />
 
@@ -522,36 +542,36 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
                         android:layout_marginEnd="6dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ng_star_filled" />
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
                         android:layout_marginEnd="6dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ng_star_filled" />
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
                         android:layout_marginEnd="6dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ng_star_filled" />
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
                         android:layout_marginEnd="6dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ng_star_empty" />
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ng_star_empty" />
                 </LinearLayout>
