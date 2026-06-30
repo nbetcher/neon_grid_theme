@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Neon Grid — the GLOW RAMP. One source of truth for every text-glow radius so the whole theme's
+  bloom is edited in one place. Three interaction tiers + a few display sizes. Values are the +25%
+  step (round(old * 1.25)). These are FLOAT resources (android:shadowRadius is an unscaled px float,
+  not a dp dimension) referenced as @dimen/ng_glow_*.
+
+    HOT   (t1) — primary/filled actions, FAB, checked controls
+    WARM  (t2) — outlined/tonal, segmented-selected, switch-on label, accent text
+    EMBER (t3) — ghost/text buttons, status pills, active control labels
+    (the off rung — unselected segments/chips, Neutral, Overline — carries NO glow, by design)
+-->
+<resources>
+    <item name="ng_glow_t1" format="float" type="dimen">14</item>
+    <item name="ng_glow_t2" format="float" type="dimen">11</item>
+    <item name="ng_glow_t3" format="float" type="dimen">8</item>
+    <item name="ng_glow_display" format="float" type="dimen">15</item>
+    <item name="ng_glow_hero" format="float" type="dimen">20</item>
+    <item name="ng_glow_tile" format="float" type="dimen">13</item>
+</resources>

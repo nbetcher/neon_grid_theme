@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Unchecked box: dim neon outline on the input substrate. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@color/ng_input" />
-    <stroke android:width="2dp" android:color="@color/ng_outline" />
-    <corners android:radius="6dp" />
-    <size android:width="22dp" android:height="22dp" />
-</shape>
+<!-- Unchecked box: dim neon outline on the input substrate. A 38dp transparent sizer keeps the
+     same footprint as ng_check_on so the box doesn't shift when toggled. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/ng_transparent" />
+            <size android:width="38dp" android:height="38dp" />
+        </shape>
+    </item>
+    <item
+        android:width="22dp"
+        android:height="22dp"
+        android:gravity="center">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/ng_input" />
+            <stroke android:width="2dp" android:color="@color/ng_outline" />
+            <corners android:radius="6dp" />
+        </shape>
+    </item>
+</layer-list>

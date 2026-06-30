@@ -23,20 +23,30 @@
          BUTTONS  — the signature look: translucent neon fill, glowing stroke, neon label.
          Default = primary; variants just swap which role the state lists read.
          ===================================================================== -->
+    <!-- Default = primary. The neon read comes from a bright stroke + a GLOWING LABEL
+         (text-shadow, like the source's `.btn { text-shadow: 0 0 6px currentColor }`) over a
+         translucent fill — no heavy halo. Variants swap which role the state lists + glow read. -->
     <style name="Widget.NeonGrid.Button" parent="Widget.Material3.Button">
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
         <item name="backgroundTint">@color/ng_fill_primary</item>
         <item name="strokeColor">@color/ng_stroke_primary</item>
-        <item name="strokeWidth">1dp</item>
+        <item name="strokeWidth">1.5dp</item>
         <item name="android:textColor">@color/ng_label_primary</item>
         <item name="iconTint">@color/ng_label_primary</item>
         <item name="rippleColor">@color/ng_fill_primary</item>
+        <item name="android:shadowColor">?attr/colorPrimary</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t1</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
         <item name="cornerRadius">8dp</item>
         <item name="android:minHeight">48dp</item>
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
         <item name="iconPadding">8dp</item>
-        <item name="elevation">0dp</item>
+        <!-- HOT tier: colored elevation halo (API 28+) layered under the lit stroke + glowing label. -->
+        <item name="elevation">4dp</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorPrimary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorPrimary</item>
     </style>
 
     <style name="Widget.NeonGrid.Button.Secondary">
@@ -45,6 +55,9 @@
         <item name="android:textColor">@color/ng_label_secondary</item>
         <item name="iconTint">@color/ng_label_secondary</item>
         <item name="rippleColor">@color/ng_fill_secondary</item>
+        <item name="android:shadowColor">?attr/colorSecondary</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorSecondary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorSecondary</item>
     </style>
 
     <style name="Widget.NeonGrid.Button.Tertiary">
@@ -53,6 +66,9 @@
         <item name="android:textColor">@color/ng_label_tertiary</item>
         <item name="iconTint">@color/ng_label_tertiary</item>
         <item name="rippleColor">@color/ng_fill_tertiary</item>
+        <item name="android:shadowColor">?attr/colorTertiary</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorTertiary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorTertiary</item>
     </style>
 
     <!-- Accent (the 4th, distinct from the primary/secondary/tertiary trio). -->
@@ -62,6 +78,9 @@
         <item name="android:textColor">@color/ng_label_accent</item>
         <item name="iconTint">@color/ng_label_accent</item>
         <item name="rippleColor">@color/ng_fill_accent</item>
+        <item name="android:shadowColor">?attr/ngAccent</item>
+        <item name="android:outlineSpotShadowColor">?attr/ngAccent</item>
+        <item name="android:outlineAmbientShadowColor">?attr/ngAccent</item>
     </style>
 
     <style name="Widget.NeonGrid.Button.Danger">
@@ -70,15 +89,27 @@
         <item name="android:textColor">@color/ng_label_error</item>
         <item name="iconTint">@color/ng_label_error</item>
         <item name="rippleColor">@color/ng_fill_error</item>
+        <item name="android:shadowColor">?attr/colorError</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorError</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorError</item>
     </style>
 
-    <!-- Ghost: quiet outline that lights primary on touch. -->
+    <!-- Ghost: the quietest variant, but never glow-less. EMBER tier — a faint resting cyan ember on
+         the label + a lit-on-touch primary elevation halo. -->
     <style name="Widget.NeonGrid.Button.Ghost">
         <item name="backgroundTint">@color/ng_transparent</item>
         <item name="strokeColor">@color/ng_btn_neutral_stroke</item>
+        <item name="strokeWidth">1.5dp</item>
         <item name="android:textColor">@color/ng_btn_neutral_text</item>
         <item name="iconTint">@color/ng_btn_neutral_text</item>
         <item name="rippleColor">@color/ng_fill_primary</item>
+        <item name="android:shadowColor">@color/ng_cyan</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t3</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="elevation">1dp</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorPrimary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorPrimary</item>
     </style>
 
     <!-- Compact button (table-row actions). -->
@@ -91,31 +122,55 @@
         <item name="android:insetBottom">2dp</item>
     </style>
 
-    <!-- Truly outlined (no fill) variant. -->
+    <!-- Truly outlined (no fill) variant. WARM tier: glowing label + lit edge + a faint primary
+         elevation halo, so it's never glow-less. -->
     <style name="Widget.NeonGrid.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
         <item name="strokeColor">@color/ng_stroke_primary</item>
-        <item name="strokeWidth">1dp</item>
+        <item name="strokeWidth">1.5dp</item>
         <item name="android:textColor">@color/ng_label_primary</item>
         <item name="iconTint">@color/ng_label_primary</item>
         <item name="rippleColor">@color/ng_fill_primary</item>
+        <item name="android:shadowColor">?attr/colorPrimary</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t2</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="elevation">2dp</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorPrimary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorPrimary</item>
         <item name="cornerRadius">8dp</item>
         <item name="android:minHeight">48dp</item>
     </style>
 
+    <!-- Text-only. EMBER tier: glow lives entirely in the label. -->
     <style name="Widget.NeonGrid.Button.Text" parent="Widget.Material3.Button.TextButton">
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
         <item name="android:textColor">@color/ng_label_primary</item>
         <item name="iconTint">@color/ng_label_primary</item>
         <item name="rippleColor">@color/ng_fill_primary</item>
+        <item name="android:shadowColor">?attr/colorPrimary</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t3</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
     </style>
 
+    <!-- Tonal. WARM tier: was a dead gray — now a green-tinted translucent fill + lit secondary edge
+         + glowing secondary label, joining the neon family. -->
     <style name="Widget.NeonGrid.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
-        <item name="backgroundTint">@color/ng_surface_higher</item>
+        <item name="backgroundTint">@color/ng_fill_secondary</item>
+        <item name="strokeColor">@color/ng_stroke_secondary</item>
+        <item name="strokeWidth">1dp</item>
         <item name="android:textColor">@color/ng_label_secondary</item>
         <item name="iconTint">@color/ng_label_secondary</item>
         <item name="rippleColor">@color/ng_fill_secondary</item>
+        <item name="android:shadowColor">?attr/colorSecondary</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t2</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="elevation">2dp</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorSecondary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorSecondary</item>
         <item name="cornerRadius">8dp</item>
         <item name="android:minHeight">48dp</item>
     </style>
@@ -132,7 +187,7 @@
         <item name="backgroundTint">?attr/colorPrimary</item>
         <item name="tint">@color/ng_on_neon</item>
         <item name="rippleColor">@color/ng_ripple_light</item>
-        <item name="elevation">6dp</item>
+        <item name="elevation">8dp</item>
         <item name="android:outlineSpotShadowColor">?attr/colorPrimary</item>
         <item name="android:outlineAmbientShadowColor">?attr/colorPrimary</item>
         <item name="shapeAppearance">@style/ShapeAppearance.NeonGrid.Large</item>
@@ -144,8 +199,9 @@
         <item name="android:textColor">@color/ng_on_neon</item>
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
         <item name="rippleColor">@color/ng_ripple_light</item>
-        <item name="elevation">6dp</item>
+        <item name="elevation">8dp</item>
         <item name="android:outlineSpotShadowColor">?attr/colorPrimary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorPrimary</item>
     </style>
 
     <!-- =====================================================================
@@ -206,7 +262,7 @@
         <item name="trackTint">@color/ng_switch_track</item>
         <item name="trackDecorationTint">@color/ng_switch_track_decoration</item>
         <item name="android:textColor">@color/ng_control_label</item>
-        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control</item>
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control.Glow</item>
     </style>
 
     <!-- Custom neon compound-button drawables (translucent fill + glowing stroke + bright mark),
@@ -216,7 +272,7 @@
         <item name="android:button">@drawable/ng_checkbox_button_spaced</item>
         <item name="buttonTint">@null</item>
         <item name="android:textColor">@color/ng_control_label</item>
-        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control</item>
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control.Glow</item>
     </style>
 
     <style name="Widget.NeonGrid.RadioButton" parent="Widget.Material3.CompoundButton.RadioButton">
@@ -224,7 +280,7 @@
         <item name="android:button">@drawable/ng_radio_button_spaced</item>
         <item name="buttonTint">@null</item>
         <item name="android:textColor">@color/ng_control_label</item>
-        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control</item>
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.Control.Glow</item>
     </style>
 
     <!-- =====================================================================
@@ -253,6 +309,10 @@
         <item name="checkedIconTint">?attr/colorSecondary</item>
         <item name="rippleColor">@color/ng_fill_secondary</item>
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelMedium</item>
+        <item name="android:shadowColor">?attr/colorSecondary</item>
+        <item name="android:shadowRadius">9</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
         <item name="chipMinHeight">32dp</item>
     </style>
 
@@ -270,22 +330,39 @@
         <item name="chipBackgroundColor">@color/ng_green_10</item>
         <item name="chipStrokeColor">@color/ng_stroke_green</item>
         <item name="android:textColor">@color/ng_green</item>
+        <item name="android:shadowColor">@color/ng_green</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t3</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
     </style>
     <style name="Widget.NeonGrid.Chip.Status.Info">
         <item name="chipBackgroundColor">@color/ng_cyan_10</item>
         <item name="chipStrokeColor">@color/ng_stroke_cyan</item>
         <item name="android:textColor">@color/ng_cyan</item>
+        <item name="android:shadowColor">@color/ng_cyan</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t3</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
     </style>
     <style name="Widget.NeonGrid.Chip.Status.Warning">
         <item name="chipBackgroundColor">@color/ng_yellow_18</item>
         <item name="chipStrokeColor">@color/ng_stroke_yellow</item>
         <item name="android:textColor">@color/ng_yellow</item>
+        <item name="android:shadowColor">@color/ng_yellow</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t3</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
     </style>
     <style name="Widget.NeonGrid.Chip.Status.Danger">
         <item name="chipBackgroundColor">@color/ng_red_10</item>
         <item name="chipStrokeColor">@color/ng_stroke_red</item>
         <item name="android:textColor">@color/ng_red</item>
+        <item name="android:shadowColor">@color/ng_red</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t3</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
     </style>
+    <!-- Neutral is the intentional off-rung: no glow (preserves hierarchy). -->
     <style name="Widget.NeonGrid.Chip.Status.Neutral">
         <item name="chipBackgroundColor">@color/ng_surface_higher</item>
         <item name="chipStrokeColor">@color/ng_outline</item>
@@ -295,14 +372,23 @@
     <!-- =====================================================================
          SEGMENTED BUTTONS  — MaterialButtonToggleGroup children.
          ===================================================================== -->
+    <!-- Segmented (single-select toggle). The selected segment lights: brighter secondary fill +
+         1.5dp lit edge + glowing secondary label + a secondary elevation halo (WARM tier). -->
     <style name="Widget.NeonGrid.Button.Segmented" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelMedium</item>
         <item name="backgroundTint">@color/ng_segmented_bg</item>
         <item name="strokeColor">@color/ng_stroke_secondary</item>
-        <item name="strokeWidth">1dp</item>
+        <item name="strokeWidth">1.5dp</item>
         <item name="android:textColor">@color/ng_segmented_text</item>
         <item name="iconTint">@color/ng_segmented_text</item>
         <item name="rippleColor">@color/ng_fill_secondary</item>
+        <item name="android:shadowColor">?attr/colorSecondary</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t2</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="elevation">2dp</item>
+        <item name="android:outlineSpotShadowColor">?attr/colorSecondary</item>
+        <item name="android:outlineAmbientShadowColor">?attr/colorSecondary</item>
         <item name="android:minHeight">44dp</item>
     </style>
 
@@ -571,6 +657,194 @@
     <style name="Widget.NeonGrid.Divider" parent="Widget.Material3.MaterialDivider">
         <item name="dividerColor">@color/ng_border</item>
         <item name="dividerThickness">1dp</item>
+    </style>
+
+    <!-- =====================================================================
+         ACCORDION  — expand / collapse panel (the source's roadmap "phase" pattern, finally
+         given a first-class style set). A colored left-accent card whose clickable header row
+         (tile · title + tagline · neon progress · state pill · caret) reveals a hairline-separated
+         body. The theme supplies the LOOK; behaviour is one toggle — flip the body's visibility and
+         rotate the caret (-90°⇄0°). Compose with @layout/ng_accordion_item; see the sample's
+         MainActivity for the ~10-line expand/collapse wiring (TransitionManager animates it).
+         ===================================================================== -->
+
+    <!-- The panel shell. contentPadding 0 so the header/body own their spacing, and a thin
+         dim-primary stroke (vs the heavier 2dp card border) so stacked accordions stay quiet.
+         Pair with a 4dp left-accent View (first child) for the source's colored border-left. -->
+    <style name="Widget.NeonGrid.Accordion" parent="Widget.NeonGrid.CardView">
+        <item name="cardBackgroundColor">@color/ng_surface</item>
+        <item name="strokeColor">@color/ng_stroke_primary</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="contentPadding">0dp</item>
+        <item name="rippleColor">@color/ng_fill_primary</item>
+    </style>
+
+    <!-- Clickable header row. selectableItemBackground gives the press ripple; the whole row is the
+         toggle target (≥48dp). -->
+    <style name="Widget.NeonGrid.Accordion.Header" parent="">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:minHeight">68dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <!-- 46dp lit tile that holds the phase key / icon. Defaults to cyan; swap android:background to
+         @drawable/ng_tile_{green,fuchsia,orange,violet,red} and android:textColor to match for the
+         full spectrum (see the showcase roadmap). -->
+    <style name="Widget.NeonGrid.Accordion.Tile" parent="">
+        <item name="android:layout_width">46dp</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/ng_tile_cyan</item>
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.AccordionTitle</item>
+        <item name="android:textColor">@color/ng_cyan</item>
+    </style>
+
+    <style name="Widget.NeonGrid.Accordion.Title" parent="">
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.AccordionTitle</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Widget.NeonGrid.Accordion.Tagline" parent="">
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.BodySmall</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Caret. Sits at rest pointing down (expanded); rotate the view -90° for the collapsed state.
+         Animate the rotation + body reveal together with a delayed transition. -->
+    <style name="Widget.NeonGrid.Accordion.Caret" parent="">
+        <item name="android:layout_width">26dp</item>
+        <item name="android:layout_height">26dp</item>
+        <item name="android:src">@drawable/ng_accordion_caret</item>
+        <item name="android:scaleType">center</item>
+        <item name="android:contentDescription">@null</item>
+    </style>
+
+    <!-- The revealed region. Its background draws the source's header→body rule (1dp faint cyan,
+         full width); stack mini-label sections, exit rows, workstreams, etc. inside. -->
+    <style name="Widget.NeonGrid.Accordion.Body" parent="">
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@drawable/ng_accordion_body_bg</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">18dp</item>
+    </style>
+
+    <!-- Thicker, fully-rounded progress for the accordion header / roadmap rows (source's
+         12px `.phase-prog-track`). Recolor per row via app:indicatorColor. -->
+    <style name="Widget.NeonGrid.LinearProgress.Phase" parent="Widget.NeonGrid.LinearProgress">
+        <item name="trackThickness">12dp</item>
+        <item name="trackCornerRadius">6dp</item>
+        <item name="trackColor">@color/ng_input</item>
+    </style>
+
+    <!-- =====================================================================
+         STATE PILLS  — non-interactive neon status capsules (the source's `.phase-status-chip`).
+         A plain TextView gets a glowing pill background + matching label color. Unlike the Material
+         status Chips these carry no ripple / min-touch-target, so they sit inline in a header.
+         ===================================================================== -->
+    <style name="Widget.NeonGrid.StatePill" parent="">
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelSmall</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minHeight">26dp</item>
+        <item name="android:paddingStart">13dp</item>
+        <item name="android:paddingEnd">13dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:background">@drawable/ng_pill_active</item>
+        <item name="android:textColor">@color/ng_cyan</item>
+        <item name="android:shadowColor">@color/ng_cyan</item>
+        <item name="android:shadowRadius">11</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+    </style>
+    <style name="Widget.NeonGrid.StatePill.Active">
+        <item name="android:background">@drawable/ng_pill_active</item>
+        <item name="android:textColor">@color/ng_cyan</item>
+        <item name="android:shadowColor">@color/ng_cyan</item>
+    </style>
+    <style name="Widget.NeonGrid.StatePill.Done">
+        <item name="android:background">@drawable/ng_pill_done</item>
+        <item name="android:textColor">@color/ng_green</item>
+        <item name="android:shadowColor">@color/ng_green</item>
+    </style>
+    <style name="Widget.NeonGrid.StatePill.Blocked">
+        <item name="android:background">@drawable/ng_pill_blocked</item>
+        <item name="android:textColor">@color/ng_red</item>
+        <item name="android:shadowColor">@color/ng_red</item>
+    </style>
+    <style name="Widget.NeonGrid.StatePill.Planned">
+        <item name="android:background">@drawable/ng_pill_planned</item>
+        <item name="android:textColor">@color/ng_text_secondary</item>
+        <item name="android:shadowColor">@color/ng_transparent</item>
+    </style>
+
+    <!-- =====================================================================
+         GLOW BUTTONS  — clickable neon: a baked-in gaussian-bloom border + translucent fill
+         (9-patch background) under a glowing label, with a ripple foreground. Use where you want
+         the control itself to light up (vs the flatter Material variants). minSdk-24 safe.
+         ===================================================================== -->
+    <style name="Widget.NeonGrid.GlowButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/ng_glow_btn_cyan</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:textAppearance">@style/TextAppearance.NeonGrid.LabelLarge</item>
+        <item name="android:textColor">@color/ng_cyan</item>
+        <item name="android:shadowColor">@color/ng_cyan</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t1</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minWidth">88dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+    <style name="Widget.NeonGrid.GlowButton.Green">
+        <item name="android:background">@drawable/ng_glow_btn_green</item>
+        <item name="android:textColor">@color/ng_green</item>
+        <item name="android:shadowColor">@color/ng_green</item>
+    </style>
+    <style name="Widget.NeonGrid.GlowButton.Fuchsia">
+        <item name="android:background">@drawable/ng_glow_btn_fuchsia</item>
+        <item name="android:textColor">@color/ng_fuchsia</item>
+        <item name="android:shadowColor">@color/ng_fuchsia</item>
+    </style>
+    <style name="Widget.NeonGrid.GlowButton.Orange">
+        <item name="android:background">@drawable/ng_glow_btn_orange</item>
+        <item name="android:textColor">@color/ng_orange</item>
+        <item name="android:shadowColor">@color/ng_orange</item>
+    </style>
+    <style name="Widget.NeonGrid.GlowButton.Red">
+        <item name="android:background">@drawable/ng_glow_btn_red</item>
+        <item name="android:textColor">@color/ng_red</item>
+        <item name="android:shadowColor">@color/ng_red</item>
+    </style>
+    <style name="Widget.NeonGrid.GlowButton.Violet">
+        <item name="android:background">@drawable/ng_glow_btn_violet</item>
+        <item name="android:textColor">@color/ng_violet</item>
+        <item name="android:shadowColor">@color/ng_violet</item>
+    </style>
+
+    <!-- =====================================================================
+         GLOW PROGRESS  — Tron channel: dark bordered track + a bright glowing fill that blooms
+         above/below the channel (9-patch). Recolor per row via android:progressDrawable.
+         ===================================================================== -->
+    <style name="Widget.NeonGrid.GlowProgress" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/ng_progress_cyan</item>
+        <item name="android:minHeight">22dp</item>
+        <item name="android:maxHeight">22dp</item>
+        <item name="android:indeterminate">false</item>
     </style>
 
 </resources>

@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Selected radio: translucent primary fill + glowing primary ring + primary dot. -->
+<!-- Selected radio: soft neon glow halo (baked) behind a translucent primary fill + glowing primary
+     ring + primary dot. 38dp footprint matches ng_radio_off so the ring doesn't shift. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
+    <item
+        android:drawable="@drawable/ng_glow_radio"
+        android:gravity="center" />
+    <item
+        android:width="22dp"
+        android:height="22dp"
+        android:gravity="center">
         <shape android:shape="oval">
             <solid android:color="@color/ng_fill_primary" />
             <stroke android:width="2dp" android:color="?attr/colorPrimary" />
-            <size android:width="22dp" android:height="22dp" />
         </shape>
     </item>
     <item

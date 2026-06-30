@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Faint cyan 1dp rule — the hairline that separates an accordion header from its body
+     (source's `border-top: 1px solid rgba(cyan,0.12)`). Reusable anywhere a quiet divider is wanted. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/ng_cyan_12" />
+    <size android:height="1dp" />
+</shape>

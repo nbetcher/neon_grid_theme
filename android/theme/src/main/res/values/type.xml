@@ -94,6 +94,16 @@
         <item name="android:letterSpacing">0.05</item>
     </style>
 
+    <!-- Control label that GLOWS when its control is checked/active (EMBER tier). The glow rides the
+         existing ng_control_label, which already lights primary when checked, so an unchecked label
+         stays quiet and a checked one emits — selection reads as a glow delta, not just a hue. -->
+    <style name="TextAppearance.NeonGrid.Control.Glow">
+        <item name="android:shadowColor">?attr/colorPrimary</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t3</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+    </style>
+
     <!-- ===== Label (uppercase, spaced — buttons, tabs, overlines) ===== -->
     <style name="TextAppearance.NeonGrid.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
         <item name="fontFamily">monospace</item>
@@ -125,6 +135,45 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <!-- Accordion / panel header title — display voice, primary-text weight, lightly spaced.
+         Matches the source's `.phase-name` (wide title over a dim tagline). -->
+    <style name="TextAppearance.NeonGrid.AccordionTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">@color/ng_text</item>
+    </style>
+
+    <!-- Section / mini label — the tiny cyan uppercase eyebrow over a body sub-section
+         (source's `.mini-label` / `.sec-label`). Brighter sibling of the dim Overline; glows cyan. -->
+    <style name="TextAppearance.NeonGrid.SectionLabel" parent="TextAppearance.Material3.LabelSmall">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.16</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:shadowColor">@color/ng_cyan</item>
+        <item name="android:shadowRadius">10</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+    </style>
+
+    <!-- Panel title — the glowing cyan section heading (source's `.panel-title`). Display voice,
+         lit with a cyan halo so it reads as a neon header, not flat text. -->
+    <style name="TextAppearance.NeonGrid.PanelTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:shadowColor">@color/ng_cyan</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_display</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+    </style>
+
     <!-- Hex/value readout — glowing mono accent (e.g. tag IDs). -->
     <style name="TextAppearance.NeonGrid.Mono.Accent" parent="TextAppearance.Material3.BodyMedium">
         <item name="fontFamily">monospace</item>
@@ -132,7 +181,7 @@
         <item name="android:letterSpacing">0.05</item>
         <item name="android:textColor">@color/ng_cyan</item>
         <item name="android:shadowColor">@color/ng_cyan</item>
-        <item name="android:shadowRadius">9</item>
+        <item name="android:shadowRadius">@dimen/ng_glow_t2</item>
         <item name="android:shadowDx">0</item>
         <item name="android:shadowDy">0</item>
     </style>

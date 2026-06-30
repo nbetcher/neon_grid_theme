@@ -23,16 +23,16 @@ Each platform implements the same shared design tokens below, idiomatically.
 
 | Token | Hex | Typical role |
 |---|---|---|
-| Cyan | `#00D4FF` | brand / primary |
-| Green | `#00FF88` | positive / secondary |
+| Cyan | `#00E0FF` | brand / primary |
+| Green | `#00FF95` | positive / secondary |
 | Fuchsia | `#FF2DAA` | tertiary |
-| Orange | `#FF8A00` | action / accent |
-| Blue | `#0088FF` | metric gradients |
-| Violet | `#7B2FFF` | brand gradients |
-| Red | `#FF3355` | danger / error |
-| Yellow | `#FFDD00` | caution |
+| Orange | `#FF9500` | action / accent |
+| Blue | `#1F9BFF` | metric gradients |
+| Violet | `#8A45FF` | brand gradients |
+| Red | `#FF3B5C` | danger / error |
+| Yellow | `#FFE11A` | caution |
 
-**Substrate** `#0A0A12` → `#1C1C44` (void → elevated)  · **Text** `#E6ECF5` / `#93A4C4` / `#5C6E92`
+**Substrate** `#0A0A12` → `#1C1C44` (void → elevated)  · **Text** `#EAF0FB` / `#9FB0D6` / `#62749C`
 
 **Type** — *Display voice*: Orbitron (wide, letter-spaced). *Mono voice*: Share Tech Mono.
 **Corners** — 6 / 8 / 12 / 20 dp. **Spacing** — a healthy medium (48dp targets, 16dp card padding).

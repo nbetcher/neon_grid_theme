@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- State pill — ACTIVE (cyan). Translucent fill + glowing stroke, fully rounded. Background for a
+     non-interactive status capsule (the source's `.phase-status-chip.active`). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/ng_cyan_10" />
+    <stroke android:width="1dp" android:color="@color/ng_cyan" />
+    <corners android:radius="20dp" />
+</shape>

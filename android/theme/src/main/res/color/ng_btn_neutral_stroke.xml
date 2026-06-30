@@ -4,5 +4,6 @@
     <item android:state_enabled="false" android:color="@color/ng_border" />
     <item android:state_pressed="true" android:color="?attr/colorPrimary" />
     <item android:state_focused="true" android:alpha="0.60" android:color="?attr/colorPrimary" />
-    <item android:color="@color/ng_outline" />
+    <!-- Resting: a faint neon edge (primary @ ~0.35) so even an idle ghost reads as lit, not gray. -->
+    <item android:alpha="0.35" android:color="?attr/colorPrimary" />
 </selector>

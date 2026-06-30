@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Neon Grid — widget showcase. Drop a host Activity on @style/Theme.NeonGrid and set this as its
-  content view to see the whole system at once. Most widgets inherit the neon styling from the
-  theme; explicit style= calls below only pick non-default color variants.
+  content view to see the whole system at once. Panels/cards/accordions use the baked gaussian-glow
+  9-patch backgrounds (ng_glow_card_*), progress uses the Tron glow bars (ng_progress_*), and the
+  Actions are glow buttons (Widget.NeonGrid.GlowButton). Material widgets pick up the neon styling
+  from the theme; explicit style= calls pick non-default variants.
 -->
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     tools:theme="@style/Theme.NeonGrid">
 
-    <LinearLayout
+    <!-- ===== Top app bar ===== -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
-        <!-- ===== Title ===== -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ACCESS CONTROL"
-            android:textAppearance="?attr/textAppearanceHeadlineMedium"
-            android:textColor="?attr/colorPrimary" />
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/ng_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:menu="@menu/ng_toolbar_menu"
+            app:subtitle="Neon Grid Design System"
+            app:title="ACCESS CONTROL" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="NEON GRID DESIGN SYSTEM"
-            android:textAppearance="@style/TextAppearance.NeonGrid.Overline" />
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- ===== Stat cards ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingTop="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="96dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
+            <!-- ===== Stat cards ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp">
+                android:baselineAligned="false"
+                android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/ng_glow_card_cyan"
                     android:orientation="vertical">
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/ng_gradient_value" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -67,28 +67,19 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:shadowColor="@color/ng_cyan"
+                        android:shadowRadius="20"
                         android:text="248"
                         android:textAppearance="?attr/textAppearanceDisplaySmall"
                         android:textColor="@color/ng_cyan" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/ng_glow_card_green"
                     android:orientation="vertical">
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/ng_accent_line_tri" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -99,90 +90,476 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:shadowColor="@color/ng_green"
+                        android:shadowRadius="20"
                         android:text="1,024"
                         android:textAppearance="?attr/textAppearanceDisplaySmall"
                         android:textColor="@color/ng_green" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
+            </LinearLayout>
 
-        <!-- ===== Panel: buttons ===== -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            <!-- ===== Roadmap header ===== -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="6dp"
+                android:text="Roadmap"
+                android:textAppearance="@style/TextAppearance.NeonGrid.PanelTitle" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="EXPAND A PHASE — TAP A ROW"
+                android:textAppearance="@style/TextAppearance.NeonGrid.Overline" />
+
+            <!-- Accordion 1 · cyan · ACTIVE · expanded -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/ng_glow_card_cyan"
                 android:orientation="vertical">
 
-                <View
+                <LinearLayout
+                    android:id="@+id/ng_acc1_header"
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="@drawable/ng_accent_line_cyan" />
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="52dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
+
+                    <TextView
+                        style="@style/Widget.NeonGrid.Accordion.Tile"
+                        android:shadowColor="@color/ng_cyan"
+                        android:shadowRadius="13"
+                        android:text="P0" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/Widget.NeonGrid.Accordion.Title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Stabilize the Foundation" />
+
+                        <TextView
+                            style="@style/Widget.NeonGrid.Accordion.Tagline"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Crash-free boot &amp; correct codegen" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ProgressBar
+                                style="@style/Widget.NeonGrid.GlowProgress"
+                                android:layout_width="0dp"
+                                android:layout_height="22dp"
+                                android:layout_weight="1"
+                                android:progress="91"
+                                android:progressDrawable="@drawable/ng_progress_cyan" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:shadowColor="@color/ng_cyan"
+                                android:shadowRadius="13"
+                                android:text="91%"
+                                android:textAppearance="@style/TextAppearance.NeonGrid.AccordionTitle"
+                                android:textColor="@color/ng_cyan"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/Widget.NeonGrid.StatePill.Active"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="ACTIVE" />
+
+                    <ImageView
+                        android:id="@+id/ng_acc1_caret"
+                        style="@style/Widget.NeonGrid.Accordion.Caret"
+                        android:layout_marginStart="4dp"
+                        app:tint="@color/ng_cyan" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ng_acc1_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ng_accordion_body_bg"
+                    android:orientation="vertical"
+                    android:paddingTop="14dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingMultiplier="1.3"
+                        android:text="Eliminate every deterministic crash, ABI mismatch, and miscompile so the browser launches and runs reliably."
+                        android:textAppearance="@style/TextAppearance.NeonGrid.BodyMedium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="EXIT CRITERIA"
+                        android:textAppearance="@style/TextAppearance.NeonGrid.SectionLabel" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="top"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginTop="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ng_ic_check"
+                            app:tint="@color/ng_green" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Zero known deterministic crashes at startup or steady-state"
+                            android:textAppearance="@style/TextAppearance.NeonGrid.BodyMedium" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="top"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginTop="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ng_ic_check"
+                            app:tint="@color/ng_green" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="All critical codegen / ABI findings resolved or verified"
+                            android:textAppearance="@style/TextAppearance.NeonGrid.BodyMedium" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        style="@style/Widget.NeonGrid.GlowButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:text="Open phase"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Accordion 2 · violet · PLANNED · collapsed -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ng_glow_card_violet"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/ng_acc2_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="52dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
+
+                    <TextView
+                        style="@style/Widget.NeonGrid.Accordion.Tile"
+                        android:background="@drawable/ng_tile_violet"
+                        android:shadowColor="@color/ng_violet"
+                        android:shadowRadius="13"
+                        android:text="P3"
+                        android:textColor="@color/ng_violet" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/Widget.NeonGrid.Accordion.Title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Graphics &amp; Compositing" />
+
+                        <TextView
+                            style="@style/Widget.NeonGrid.Accordion.Tagline"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="GPU raster, surface control, vsync" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ProgressBar
+                                style="@style/Widget.NeonGrid.GlowProgress"
+                                android:layout_width="0dp"
+                                android:layout_height="22dp"
+                                android:layout_weight="1"
+                                android:progress="28"
+                                android:progressDrawable="@drawable/ng_progress_violet" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:shadowColor="@color/ng_violet"
+                                android:shadowRadius="13"
+                                android:text="28%"
+                                android:textAppearance="@style/TextAppearance.NeonGrid.AccordionTitle"
+                                android:textColor="@color/ng_violet"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/Widget.NeonGrid.StatePill.Planned"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="PLANNED" />
+
+                    <ImageView
+                        android:id="@+id/ng_acc2_caret"
+                        style="@style/Widget.NeonGrid.Accordion.Caret"
+                        android:layout_marginStart="4dp"
+                        android:rotation="-90" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ng_acc2_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ng_accordion_body_bg"
+                    android:orientation="vertical"
+                    android:paddingTop="14dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingMultiplier="1.3"
+                        android:text="Bring up hardware-accelerated raster and compositing on the Tegra GPU with correct vsync and surface lifetimes."
+                        android:textAppearance="@style/TextAppearance.NeonGrid.BodyMedium" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Accordion 3 · fuchsia · BLOCKED · collapsed -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ng_glow_card_fuchsia"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/ng_acc3_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="52dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
+
+                    <TextView
+                        style="@style/Widget.NeonGrid.Accordion.Tile"
+                        android:background="@drawable/ng_tile_fuchsia"
+                        android:shadowColor="@color/ng_fuchsia"
+                        android:shadowRadius="13"
+                        android:text="P5"
+                        android:textColor="@color/ng_fuchsia" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/Widget.NeonGrid.Accordion.Title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Security &amp; Sandbox" />
+
+                        <TextView
+                            style="@style/Widget.NeonGrid.Accordion.Tagline"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Seccomp, site isolation, IPC hardening" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ProgressBar
+                                style="@style/Widget.NeonGrid.GlowProgress"
+                                android:layout_width="0dp"
+                                android:layout_height="22dp"
+                                android:layout_weight="1"
+                                android:progress="55"
+                                android:progressDrawable="@drawable/ng_progress_fuchsia" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:shadowColor="@color/ng_fuchsia"
+                                android:shadowRadius="13"
+                                android:text="55%"
+                                android:textAppearance="@style/TextAppearance.NeonGrid.AccordionTitle"
+                                android:textColor="@color/ng_fuchsia"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/Widget.NeonGrid.StatePill.Blocked"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="BLOCKED" />
+
+                    <ImageView
+                        android:id="@+id/ng_acc3_caret"
+                        style="@style/Widget.NeonGrid.Accordion.Caret"
+                        android:layout_marginStart="4dp"
+                        android:rotation="-90" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ng_acc3_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ng_accordion_body_bg"
+                    android:orientation="vertical"
+                    android:paddingTop="14dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingMultiplier="1.3"
+                        android:text="Re-enable the sandbox and site isolation on the 32-bit target. Blocked on a seccomp policy gap under the Tegra kernel."
+                        android:textAppearance="@style/TextAppearance.NeonGrid.BodyMedium" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ===== Panel: actions (glow buttons) ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/ng_glow_card_cyan"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:text="Actions"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorPrimary" />
+                    android:textAppearance="@style/TextAppearance.NeonGrid.PanelTitle" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="14dp"
                     android:background="@drawable/ng_divider_gradient" />
 
-                <com.google.android.material.button.MaterialButton
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/Widget.NeonGrid.GlowButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Primary" />
 
-                <com.google.android.material.button.MaterialButton
-                    style="@style/Widget.NeonGrid.Button.Secondary"
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/Widget.NeonGrid.GlowButton.Green"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="10dp"
                     android:text="Secondary" />
 
-                <com.google.android.material.button.MaterialButton
-                    style="@style/Widget.NeonGrid.Button.Tertiary"
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/Widget.NeonGrid.GlowButton.Fuchsia"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="10dp"
                     android:text="Tertiary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/Widget.NeonGrid.Button.Accent"
+                    <androidx.appcompat.widget.AppCompatButton
+                        style="@style/Widget.NeonGrid.GlowButton.Orange"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="5dp"
                         android:text="Accent" />
 
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/Widget.NeonGrid.Button.Danger"
+                    <androidx.appcompat.widget.AppCompatButton
+                        style="@style/Widget.NeonGrid.GlowButton.Red"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="5dp"
                         android:text="Danger" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
@@ -190,7 +567,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="5dp"
                         android:text="Ghost" />
 
                     <com.google.android.material.button.MaterialButton
@@ -198,24 +575,16 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="5dp"
                         android:text="Text" />
                 </LinearLayout>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===== Panel: inputs + selection ===== -->
-        <!-- clip flags off so the focused/error field glow can spill into the card padding. -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:clipChildren="false"
-            android:clipToPadding="false">
-
+            <!-- ===== Panel: inputs + selection ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/ng_glow_card_cyan"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:orientation="vertical">
@@ -224,8 +593,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Provision"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorPrimary" />
+                    android:textAppearance="@style/TextAppearance.NeonGrid.PanelTitle" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/ng_field_tag"
@@ -258,8 +626,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:paddingEnd="6dp"
                     android:checked="true"
+                    android:paddingEnd="6dp"
                     android:text="Tag active" />
 
                 <com.google.android.material.checkbox.MaterialCheckBox
@@ -300,25 +668,19 @@
                     android:valueFrom="0"
                     android:valueTo="100" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===== Panel: chips + status ===== -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
-
+            <!-- ===== Panel: chips + status + tabs ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/ng_glow_card_cyan"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Filters"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorPrimary" />
+                    android:textAppearance="@style/TextAppearance.NeonGrid.PanelTitle" />
 
                 <com.google.android.material.chip.ChipGroup
                     android:layout_width="match_parent"
@@ -408,12 +770,13 @@
                         android:text="Schedule" />
                 </com.google.android.material.tabs.TabLayout>
 
-                <com.google.android.material.progressindicator.LinearProgressIndicator
+                <ProgressBar
+                    style="@style/Widget.NeonGrid.GlowProgress"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="22dp"
                     android:layout_marginTop="14dp"
                     android:progress="60"
-                    android:indeterminate="false" />
+                    android:progressDrawable="@drawable/ng_progress_cyan" />
 
                 <com.google.android.material.progressindicator.CircularProgressIndicator
                     android:layout_width="wrap_content"
@@ -421,25 +784,21 @@
                     android:layout_marginTop="12dp"
                     android:indeterminate="true" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===== Panel: more controls (segmented · dropdown · seek · rating) ===== -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
-
+            <!-- ===== Panel: more controls (segmented · dropdown · seek · rating) ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/ng_glow_card_cyan"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Controls"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorPrimary" />
+                    android:textAppearance="@style/TextAppearance.NeonGrid.PanelTitle" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -453,6 +812,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     app:checkedButton="@+id/ng_seg_day"
                     app:selectionRequired="true"
                     app:singleSelection="true">
@@ -522,9 +883,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:theme="@style/ThemeOverlay.NeonGrid.SeekBar"
                     android:max="100"
-                    android:progress="40" />
+                    android:progress="40"
+                    android:theme="@style/ThemeOverlay.NeonGrid.SeekBar" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -576,15 +937,137 @@
                         android:src="@drawable/ng_star_empty" />
                 </LinearLayout>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="16dp"
-            android:text="Provision"
-            app:icon="@android:drawable/ic_input_add" />
+            <!-- ===== Panel: more widgets (button variants · FAB · rating · divider · search) ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ng_glow_card_cyan"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="vertical">
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="More"
+                    android:textAppearance="@style/TextAppearance.NeonGrid.PanelTitle" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="BUTTON VARIANTS"
+                    android:textAppearance="@style/TextAppearance.NeonGrid.Overline" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.NeonGrid.Button.Outlined"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="Outlined" />
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.NeonGrid.Button.Tonal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="Tonal" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.NeonGrid.Button.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Small" />
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.NeonGrid.Button.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="Search"
+                        app:icon="@drawable/ng_ic_search" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="Add"
+                        app:srcCompat="@drawable/ng_ic_plus" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="RATING (WIDGET)"
+                    android:textAppearance="@style/TextAppearance.NeonGrid.Overline" />
+
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:numStars="5"
+                    android:rating="3.5"
+                    android:stepSize="0.5" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="SEARCH"
+                    android:textAppearance="@style/TextAppearance.NeonGrid.Overline" />
+
+                <com.google.android.material.search.SearchBar
+                    android:id="@+id/ng_searchbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:hint="Search tags, people, zones…" />
+            </LinearLayout>
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="8dp"
+                android:text="Provision"
+                app:icon="@drawable/ng_ic_plus" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ===== Bottom navigation ===== -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/ng_bottomnav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:menu="@menu/ng_bottom_nav_menu" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

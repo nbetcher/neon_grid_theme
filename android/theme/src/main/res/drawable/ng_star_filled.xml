@@ -6,9 +6,9 @@
             <gradient
                 android:type="radial"
                 android:gradientRadius="17dp"
-                android:startColor="#B3FFDD00"
-                android:centerColor="#40FFDD00"
-                android:endColor="#00FFDD00" />
+                android:startColor="#B3FFE11A"
+                android:centerColor="#40FFE11A"
+                android:endColor="#00FFE11A" />
             <size android:width="34dp" android:height="34dp" />
         </shape>
     </item>

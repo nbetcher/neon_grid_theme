@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neon icon tile (10dp rounded square): translucent cyan fill + glowing cyan stroke. The source's
+     `.phase-badge` — a lit square that holds an icon or a phase key (P0…). Also good for list
+     avatars and logo tiles. Put the hue-matched glyph/letter on top in the same color. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/ng_cyan_18" />
+    <stroke android:width="1.5dp" android:color="@color/ng_cyan" />
+    <corners android:radius="10dp" />
+</shape>

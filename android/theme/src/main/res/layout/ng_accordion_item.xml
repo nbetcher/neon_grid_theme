@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Neon Grid — reusable accordion item (the source's roadmap "phase" panel).
+
+  Drop this in (or <include> it) and wire the toggle in ~10 lines: on ng_acc_header click, flip
+  ng_acc_body between GONE/VISIBLE and rotate ng_acc_caret (-90°⇄0°), wrapping both in a
+  TransitionManager.beginDelayedTransition(parent) for the smooth expand/collapse. See the sample's
+  MainActivity. Recolor a row by swapping the left stripe color, the tile background
+  (@drawable/ng_tile_*), the tile/progress color, and the state-pill style.
+
+  Ships expanded (body VISIBLE, caret at rest pointing down) so it renders complete in a preview.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.NeonGrid.Accordion"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Colored left-accent (the source's border-left). Swap the color per row. -->
+        <View
+            android:id="@+id/ng_acc_stripe"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="@color/ng_cyan" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- ===== Header (the toggle target) ===== -->
+            <LinearLayout
+                android:id="@+id/ng_acc_header"
+                style="@style/Widget.NeonGrid.Accordion.Header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/ng_acc_tile"
+                    style="@style/Widget.NeonGrid.Accordion.Tile"
+                    android:text="P0" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/ng_acc_title"
+                        style="@style/Widget.NeonGrid.Accordion.Title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Stabilize the Foundation" />
+
+                    <TextView
+                        android:id="@+id/ng_acc_tagline"
+                        style="@style/Widget.NeonGrid.Accordion.Tagline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Crash-free boot &amp; correct codegen" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="9dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/ng_acc_progress"
+                            style="@style/Widget.NeonGrid.LinearProgress.Phase"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:progress="91" />
+
+                        <TextView
+                            android:id="@+id/ng_acc_pct"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="91%"
+                            android:textAppearance="@style/TextAppearance.NeonGrid.AccordionTitle"
+                            android:textColor="@color/ng_cyan"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/ng_acc_pill"
+                    style="@style/Widget.NeonGrid.StatePill.Active"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="ACTIVE" />
+
+                <ImageView
+                    android:id="@+id/ng_acc_caret"
+                    style="@style/Widget.NeonGrid.Accordion.Caret"
+                    android:layout_marginStart="6dp" />
+            </LinearLayout>
+
+            <!-- ===== Body (revealed on expand) ===== -->
+            <LinearLayout
+                android:id="@+id/ng_acc_body"
+                style="@style/Widget.NeonGrid.Accordion.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Eliminate every deterministic crash, ABI mismatch, and miscompile so the browser launches and runs reliably."
+                    android:textAppearance="@style/TextAppearance.NeonGrid.BodyMedium"
+                    android:lineSpacingMultiplier="1.3" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="EXIT CRITERIA"
+                    android:textAppearance="@style/TextAppearance.NeonGrid.SectionLabel" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="2dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ng_ic_check"
+                        app:tint="@color/ng_green" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Zero known deterministic crashes at startup or steady-state"
+                        android:textAppearance="@style/TextAppearance.NeonGrid.BodyMedium" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="2dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ng_ic_check"
+                        app:tint="@color/ng_green" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="All critical codegen / ABI findings resolved or verified"
+                        android:textAppearance="@style/TextAppearance.NeonGrid.BodyMedium" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -5,9 +5,9 @@ A theme inspired by a certain 80's film with "The Grid" — deep blue-black lit 
 hairlines, letter-spaced display type over terminal mono. Grid kept; scanlines dropped.
 
 <p align="center">
-  <img src="android/screenshots/showcase_top.png" width="240" alt="Neon Grid — buttons, borders, titles">
-  <img src="android/screenshots/showcase_mid.png" width="240" alt="Neon Grid — selection controls">
-  <img src="android/screenshots/showcase_scrolled.png" width="240" alt="Neon Grid — chips, tabs, segmented, more">
+  <img src="android/screenshots/showcase_roadmap.png" width="240" alt="Neon Grid — roadmap accordions, stat cards, app bar">
+  <img src="android/screenshots/showcase_inputs.png" width="240" alt="Neon Grid — selection controls, chips, tabs">
+  <img src="android/screenshots/showcase_controls.png" width="240" alt="Neon Grid — segmented, dropdown, rating, button variants">
 </p>
 
 ➡ **[INDEX.md](INDEX.md)** — every supported platform/framework.

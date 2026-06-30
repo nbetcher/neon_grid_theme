@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom-navigation destinations for the showcase. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/ng_nav_dashboard"
+        android:icon="@drawable/ng_ic_grid"
+        android:title="Dashboard" />
+
+    <item
+        android:id="@+id/ng_nav_roadmap"
+        android:icon="@drawable/ng_ic_list"
+        android:title="Roadmap" />
+
+    <item
+        android:id="@+id/ng_nav_security"
+        android:icon="@drawable/ng_ic_shield"
+        android:title="Security" />
+</menu>
