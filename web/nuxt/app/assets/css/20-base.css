@@ -1,0 +1,131 @@
+/* 20-base.css — document, typography defaults, focus, scrollbar, utilities. */
+@layer neon.base {
+  /* ── A11Y FIX (dossier 11 §10.5) ───────────────────────────────────────────
+     The source had `html { font-size: 14px }`. A hard pixel root size silently
+     overrides the user's browser font-size preference (WCAG 1.4.4 risk).
+     87.5% is 14px at the default 16px root and scales with the preference.
+     Every rem value in this theme was authored against that 14px baseline, so
+     nothing else changes. ------------------------------------------------- */
+  html {
+    font-size: 87.5%;
+    /* The console is a long-lived tab; keep the gutter stable when a modal
+       locks scroll so the layout does not jump 15px sideways. */
+    scrollbar-gutter: stable;
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: var(--font-mono);
+    background: var(--bg-darkest);
+    color: var(--text-primary);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Display voice. Orbitron has no italic and limited coverage — never use it
+     for user content, only for chrome. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  a {
+    color: var(--cyan);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* ── FOCUS ────────────────────────────────────────────────────────────────
+     The source indicated focus ONLY with `box-shadow: var(--glow-cyan)`, which
+     vanishes under [data-glow=off], prefers-contrast: more and forced-colors —
+     i.e. exactly the modes where a keyboard user most needs it. A real outline
+     is the base; the glow is decoration on top. -------------------------- */
+  :focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+  /* Never remove the outline for mouse users either — just don't double up. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background: rgba(0, 224, 255, 0.28);
+    color: var(--text-primary);
+  }
+
+  /* Scrollbars — the source's ::-webkit rules, plus the standard property so
+     Firefox matches. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-glow-dim) var(--bg-darkest);
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-darkest);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-glow-dim);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--cyan-dim);
+  }
+
+  /* ── UTILITIES ───────────────────────────────────────────────────────────*/
+
+  /* Screen-reader-only. Every icon-only control in this system carries one —
+     severity is communicated by ICON + COLOUR with no visible text label. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Mono hex/id text — call ids, talkgroup ids, sha prefixes. */
+  .tag-hex {
+    font-family: var(--font-mono);
+    font-size: 0.97rem;
+    color: var(--cyan);
+    text-shadow: var(--glyph-glow);
+    letter-spacing: 0.5px;
+    word-break: break-all;
+  }
+
+  /* Dense transcript body text, sized by the per-user --transcript-size token
+     rather than browser zoom, so the chrome stays put. */
+  .ng-transcript {
+    font-family: var(--font-mono);
+    font-size: var(--transcript-size);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .ng-transcript mark {
+    background: rgba(0, 224, 255, 0.18);
+    color: var(--text-primary);
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+}

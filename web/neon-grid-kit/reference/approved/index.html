@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-glow="soft">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0a0a12">
+  <title>Live channels · Verde Watch · Neon Grid concept</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="neon-grid.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg"><defs>
+    <symbol id="i-radio" viewBox="0 0 24 24"><path d="M8 16a6 6 0 0 1 0-8m8 8a6 6 0 0 0 0-8M5 19a10 10 0 0 1 0-14m14 14a10 10 0 0 0 0-14"/><circle cx="12" cy="12" r="2"/><path d="M12 14v7"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M3 7h8m4 0h6M3 17h2m4 0h12"/><circle cx="13" cy="7" r="2"/><circle cx="7" cy="17" r="2"/></symbol>
+  </defs></svg>
+
+  <aside class="sidebar">
+    <a class="brand" href="index.html"><span class="brand-icon"><svg><use href="#i-radio"/></svg></span><span>VERDE<span class="brand-sub">WATCH</span></span></a>
+    <div class="workspace-label">VERDE VALLEY</div>
+    <nav aria-label="Mockup views">
+      <button class="nav-item selected" data-view="live"><svg><use href="#i-radio"/></svg>Live channels<span class="nav-dot"></span></button>
+      <button class="nav-item" data-view="archive"><svg><use href="#i-clock"/></svg>Call archive</button>
+      <button class="nav-item" id="design-button"><svg><use href="#i-grid"/></svg>The design</button>
+    </nav>
+    <div class="sidebar-note"><div class="small-label">A LITTLE MORE CONTEXT</div><p>Every transmission has a place. Read the exchange without opening every call.</p><div class="mini-timeline"><i></i><span></span><i></i><span></span><i></i></div></div>
+    <div class="sidebar-bottom"><span class="avatar">VV</span><div>Verde Valley<span>Local operator console</span></div></div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar"><div class="breadcrumb">Workspace<span>/</span><strong id="breadcrumb-view">Live channels</strong></div><div class="demo-label"><span></span>INTERACTIVE CONCEPT <b>Fictional radio traffic</b></div></header>
+    <main id="main">
+      <div class="page-heading"><div><div class="eyebrow">VERDE VALLEY // THE CHANNEL, IN CONTEXT</div><h1 id="page-title">Live <span class="title-outline">channels</span><span class="title-dot">.</span></h1><p id="page-description">What’s being said, channel by channel. The latest words, with the exchange behind them.</p></div><div class="heading-actions"><button id="pause-button" class="button secondary"><svg><use href="#i-pause"/></svg>Pause view</button><button id="advance-button" class="button primary"><span>+</span> Add demo call</button></div></div>
+
+      <div class="overview-line"><div><span class="status-dot"></span><strong id="recent-count">3 channels with recent calls</strong><span class="overview-separator">/</span><span>5 sample channels</span></div><span id="as-of" class="mono">Snapshot · 14:32:18 MST</span></div>
+      <section class="toolbar" aria-label="Display controls">
+        <label class="search"><svg><use href="#i-search"/></svg><input id="search" type="search" placeholder="Find a channel or phrase…" aria-label="Find a channel or phrase"><kbd>/</kbd></label>
+        <div class="toolbar-options"><div class="segmented" aria-label="Channel filter"><button class="active" data-filter="all" aria-pressed="true">All channels</button><button data-filter="recent" aria-pressed="false">Recent only</button></div><button class="settings-button" id="settings-button" aria-expanded="false" aria-controls="settings-panel"><svg><use href="#i-sliders"/></svg>View</button></div>
+      </section>
+      <div id="settings-panel" class="settings-panel" hidden><label><input id="highlights" type="checkbox" checked> Highlight sample watch terms</label><label><input id="large-text" type="checkbox"> Larger transcript text</label><label><input id="glow" type="checkbox" checked> Soft neon glow</label><span>Newest 500 characters, within each channel’s adaptive look-back.</span></div>
+      <div id="paused-banner" class="paused-banner" hidden><span>View paused. New demo calls wait here while you read.</span><button id="catch-up">Catch up <span id="pending-count">0</span></button></div>
+      <div class="list-caption"><span id="list-caption">01 / CHANNEL READOUT</span><span id="budget-caption">500 characters max · Adaptive look-back <button id="window-help" class="help-button" aria-label="About the look-back limit">?</button></span></div>
+      <section id="channel-list" aria-label="Recent speech by channel"></section>
+      <section id="archive" aria-label="Sample call archive" hidden></section>
+      <div id="empty" class="empty-result" hidden>No channels or phrases match. Try a different search.</div>
+      <footer class="page-footer"><span><svg><use href="#i-check"/></svg> Original call boundaries preserved</span><span>Text after transcription · MST <b class="theme-credit">NEON GRID</b></span></footer>
+    </main>
+  </div>
+  <dialog id="detail-dialog" aria-labelledby="detail-title"><div id="detail-content"></div></dialog>
+  <dialog id="design-dialog" class="design-dialog" aria-labelledby="design-title"><div class="dialog-top"><span class="eyebrow">DESIGN NOTES</span><button class="icon-button" data-close="design-dialog" aria-label="Close design notes"><svg><use href="#i-close"/></svg></button></div><h2 id="design-title">A view over calls.<br>One source of truth.</h2><p>Each channel shows the latest <strong>500 characters of transcript</strong>, stopping sooner at its <strong>adaptive look-back boundary</strong>. Older words leave this view; the original calls remain in history.</p><div class="design-steps"><div><b>01</b><p><strong>Read the channel</strong><br>Short, timestamped transmissions. Newest at the bottom. Stable channel order, so updates don’t move your place.</p></div><div><b>02</b><p><strong>Open any call</strong><br>See its full words first, followed by the surrounding exchange. Every line leads back to its source call.</p></div><div><b>03</b><p><strong>Stay honest about freshness</strong><br>Pending text, quiet channels, and failed transcription are distinct. Nearby calls are context, not proof of a shared incident.</p></div></div><p class="muted">This standalone concept uses fictional, in-memory calls and sample window widths. “Add demo call” advances the sample clock by 18 seconds. No audio or live service is connected.</p><a class="button primary plan-link" href="PLAN.md" target="_blank" rel="noopener">Read the implementation plan <svg><use href="#i-arrow"/></svg></a></dialog>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+</body>
+</html>

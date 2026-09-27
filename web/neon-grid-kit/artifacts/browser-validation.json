@@ -1,0 +1,120 @@
+{
+  "browser": "Microsoft Edge",
+  "examples": [
+    {
+      "name": "gallery",
+      "url": "http://127.0.0.1:4320/",
+      "pass": true,
+      "interactive": false,
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "name": "vanilla",
+      "url": "http://127.0.0.1:4320/vanilla/",
+      "pass": true,
+      "interactive": true,
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "name": "react",
+      "url": "http://127.0.0.1:4320/react/",
+      "pass": true,
+      "interactive": true,
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "name": "vue",
+      "url": "http://127.0.0.1:4320/vue/",
+      "pass": true,
+      "interactive": true,
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "name": "svelte",
+      "url": "http://127.0.0.1:4320/svelte/",
+      "pass": true,
+      "interactive": true,
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "name": "next",
+      "url": "http://127.0.0.1:4314/",
+      "pass": true,
+      "interactive": true,
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "name": "nuxt",
+      "url": "http://127.0.0.1:4315/",
+      "pass": true,
+      "interactive": true,
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    },
+    {
+      "name": "tailwind",
+      "url": "http://127.0.0.1:4320/tailwind/",
+      "pass": true,
+      "interactive": false,
+      "widths": [
+        1440,
+        1024,
+        768,
+        390,
+        320
+      ]
+    }
+  ],
+  "runtime": [
+    "rapid pulse restart",
+    "nested panel isolation",
+    "arrival completion",
+    "pause cancels without replay",
+    "dynamic nav delegation",
+    "idempotent teardown",
+    "remount"
+  ],
+  "errors": [],
+  "pass": true
+}

@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chromium ARM32 Tracker</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a12'/%3E%3Cg stroke='%2300e0ff' stroke-width='1' opacity='0.45'%3E%3Cpath d='M0 8h32M0 16h32M0 24h32M8 0v32M16 0v32M24 0v32'/%3E%3C/g%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='none' stroke='%2300e0ff' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/phosphor-icons@1.4.2/src/css/icons.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div id="app" v-scope="App()" @vue:mounted="init()" class="app-wrapper" v-cloak>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="toast-container">
+    <div v-for="t in toasts" :key="t.id" class="toast animate__animated animate__fadeInRight"
+         :class="'toast-' + t.type">
+      <i :class="t.type === 'success' ? 'ph-check-circle' : t.type === 'error' ? 'ph-warning-circle' : t.type === 'warning' ? 'ph-warning' : 'ph-info'"></i>
+      <span>{{ t.message }}</span>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="header-logo">
+        <div class="logo-icon"><i class="ph-cpu"></i></div>
+        <div class="logo-text">Chromium ARM32 Tracker</div>
+      </div>
+      <span class="header-chip"><i class="ph-device-tablet"></i> Surface 2 RT · Tegra 4 · Win 8.1</span>
+      <nav class="app-nav">
+        <button class="nav-btn" :class="{active: page==='dashboard'}" @click="go('dashboard')">
+          <i class="ph-squares-four"></i><span>Dashboard</span>
+        </button>
+        <button class="nav-btn" :class="{active:page==='analytics'}" @click="go('analytics')">
+          <i class="ph-chart-line"></i><span>Analytics</span>
+        </button>
+        <button class="nav-btn" :class="{active: page==='roadmap'}" @click="go('roadmap')">
+          <i class="ph-map-trifold"></i><span>Roadmap</span>
+        </button>
+        <button class="nav-btn" :class="{active: page==='mission'}" @click="go('mission')">
+          <i class="ph-broadcast"></i><span>Mission Control</span>
+        </button>
+        <button class="nav-btn" :class="{active: page==='history'}" @click="go('history')">
+          <i class="ph-clock-counter-clockwise"></i><span>History</span>
+        </button>
+        <button class="nav-btn" :class="{active: page==='notify'}" @click="go('notify')">
+          <i class="ph-bell-ringing"></i><span>Notifications</span>
+        </button>
+      </nav>
+    </div>
+    <div class="header-right">
+      <!-- One combined connection status (real-time push + API), instead of two badges -->
+      <div class="live-pill" :class="{on: live && health.ok}" @click="openDebug()" style="cursor:pointer;"
+           :title="'Real-time push: ' + (live ? 'connected' : 'reconnecting…') + '   ·   API: ' + (health.ok ? 'online' : 'offline') + ' — click for runtime detail (workers, SSE, log tail)'">
+        <span class="live-dot" :class="{flash: liveFlash}"></span>
+        <span>{{ (live && health.ok) ? 'CONNECTED' : (health.ok ? 'RECONNECTING' : 'OFFLINE') }}</span>
+      </div>
+      <!-- Utility tools, icon-only, grouped -->
+      <div class="header-tools">
+        <button class="btn btn-ghost btn-icon" @click="refresh()" :disabled="refreshing" title="Refresh data">
+          <i class="ph-arrow-clockwise" :class="{'animate__animated animate__rotateIn': refreshing}"></i>
+        </button>
+        <button class="btn btn-ghost btn-icon" @click="openDebug()" :disabled="debug.loading" title="Debug — live worker handles, stderr tails, recent runtime log">
+          <i class="ph-pulse"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Signed-out banner — full-width strip so it never crowds the header -->
+  <div class="auth-banner" v-if="authLoggedIn === false">
+    <i class="ph-warning-circle"></i>
+    <span>The Claude CLI is <b>signed out</b> — missions can't run until you sign in.</span>
+    <button class="btn btn-warning btn-sm" @click="openLogin()"><i class="ph-sign-in"></i> Sign in</button>
+  </div>
+
+  <!-- ==================== DASHBOARD ==================== -->
+  <main class="app-main" v-if="page==='dashboard'">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="panel-arc panel-arc-tl"></div>
+        <div class="stat-icon"><i class="ph-list-bullets"></i></div>
+        <div class="stat-label">Total Findings</div>
+        <div class="stat-value">{{ stats.total || 0 }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ph-folder-open"></i></div>
+        <div class="stat-label">Open (active)</div>
+        <div class="stat-value">{{ stats.open_active || 0 }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ph-spinner-gap"></i></div>
+        <div class="stat-label">In Progress</div>
+        <div class="stat-value">{{ byStatus('in_progress') }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ph-check-circle"></i></div>
+        <div class="stat-label">Resolved</div>
+        <div class="stat-value">{{ byStatus('resolved') }}</div>
+      </div>
+      <div class="stat-card" :class="{alert: (stats.high_open || 0) > 0}">
+        <div class="panel-arc panel-arc-br"></div>
+        <div class="stat-icon"><i class="ph-warning-octagon"></i></div>
+        <div class="stat-label">Critical + High Open</div>
+        <div class="stat-value">{{ stats.high_open || 0 }}</div>
+      </div>
+    </div>
+
+    <!-- Production readiness + live agents -->
+    <div class="panel-grid" style="margin-bottom: 20px; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr);">
+      <!-- production readiness hero -->
+      <div class="panel">
+        <div class="panel-arc panel-arc-tl"></div>
+        <div class="panel-header">
+          <div class="panel-title"><i class="ph-gauge"></i> Production Readiness</div>
+          <button class="btn btn-ghost btn-sm" @click="go('roadmap')">Roadmap <i class="ph-arrow-right"></i></button>
+        </div>
+        <div class="readiness">
+          <div class="readiness-ring">
+            <svg viewBox="0 0 120 120">
+              <defs><linearGradient id="rrGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00ff88"/><stop offset="100%" stop-color="#00d4ff"/>
+              </linearGradient></defs>
+              <circle class="rr-track" cx="60" cy="60" r="52"></circle>
+              <circle class="rr-fill" cx="60" cy="60" r="52"
+                :stroke-dasharray="rrCirc" :stroke-dashoffset="rrCirc * (1 - overallPct/100)"></circle>
+            </svg>
+            <div class="rr-center">
+              <span class="rr-pct">{{ overallPct }}%</span>
+              <span class="rr-label">Ready</span>
+            </div>
+          </div>
+          <div class="phase-progress-list">
+            <div class="ppl-row" v-for="p in phases" :key="p.key" @click="go('roadmap'); openPhase(p.key)">
+              <span class="ppl-key" :style="{color: p.color}">{{ p.key }}</span>
+              <span class="ppl-name">{{ p.name }}</span>
+              <div class="ppl-track"><div class="ppl-fill" :style="{ width: p.pct + '%', background: p.color, boxShadow: '0 0 7px '+hexA(p.color,0.75)+', 0 0 15px '+hexA(p.color,0.4) }"></div></div>
+              <span class="ppl-pct">{{ p.pct }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- live agents strip -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ph-broadcast"></i> Live AI Activity</div>
+          <button class="btn btn-ghost btn-sm" @click="go('mission')">Mission Control <i class="ph-arrow-right"></i></button>
+        </div>
+        <div v-if="!liveAgents.length" class="empty-state"><i class="ph-robot"></i><p>No agents reporting</p></div>
+        <div v-else class="agent-strip">
+          <div v-for="a in liveAgents" :key="a.name" class="agent-card" :class="{working: a.status==='working'}"
+               :style="{ borderTopColor: a.color }">
+            <div class="agent-card-head">
+              <div class="agent-avatar" :style="{ background: a.color }">{{ (a.name||'?')[0] }}</div>
+              <div class="agent-id">
+                <div class="agent-name">{{ a.name }}</div>
+                <span class="agent-state" :class="a.status"><span class="st-dot"></span>{{ a.status }}</span>
+              </div>
+            </div>
+            <div class="agent-where">
+              <span class="agent-phase-chip" :style="{ borderColor: phaseColor(a.phase_key), color: phaseColor(a.phase_key) }" v-if="a.phase_key">
+                <i :class="phaseIcon(a.phase_key)"></i>{{ a.phase_key }}
+              </span>
+              <span class="chip" v-if="a.workstream_key"><i class="ph-git-branch"></i>{{ wsName(a.workstream_key) }}</span>
+            </div>
+            <div class="agent-activity">{{ a.activity || '—' }}</div>
+            <div class="agent-prog">
+              <div class="agent-prog-track"><div class="agent-prog-fill" :style="{ width: (a.progress||0)+'%', background: a.color, boxShadow: '0 0 6px '+hexA(a.color,0.75)+', 0 0 13px '+hexA(a.color,0.4) }"></div></div>
+              <span class="agent-prog-pct">{{ a.progress||0 }}%</span>
+            </div>
+            <div class="agent-foot" style="margin-top:8px;">
+              <span class="agent-finding" v-if="a.finding_slug" @click="openIssue(a.finding_slug)"><i class="ph-bug"></i> {{ a.finding_slug }}</span>
+              <span class="agent-hb">{{ timeAgo(a.last_heartbeat) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Severity distribution -->
+    <div class="panel">
+      <div class="panel-arc panel-arc-tl"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-chart-bar-horizontal"></i> Severity Distribution</div>
+      </div>
+      <div v-if="(stats.total || 0) === 0" class="empty-state"><i class="ph-chart-bar"></i><p>No findings yet</p></div>
+      <div v-else>
+        <div class="dist-bar">
+          <div v-for="s in sevOrder" :key="s" class="seg" :class="'seg-'+s"
+               :style="{ width: sevPct(s) + '%' }" :title="s + ': ' + sevCount(s)"></div>
+        </div>
+        <div class="dist-legend">
+          <div v-for="s in sevOrder.filter(x => sevCount(x) > 0)" :key="s" class="legend-item">
+            <span class="legend-dot" :style="{ background: sevColor(s) }"></span>
+            <span>{{ s }} · {{ sevCount(s) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-grid" style="margin-bottom: 20px;">
+      <!-- By workflow -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><i class="ph-flow-arrow"></i> By Workflow</div></div>
+        <div v-if="!hasKeys(stats.by_workflow)" class="empty-state"><p>No data</p></div>
+        <div v-else>
+          <div class="hbar-row" v-for="row in sortedCounts(stats.by_workflow)" :key="row.k">
+            <span class="hbar-label">{{ row.k }}</span>
+            <div class="hbar-track"><div class="hbar-fill" :style="{ width: pctOf(row.v, stats.by_workflow) + '%' }"></div></div>
+            <span class="hbar-cnt">{{ row.v }}</span>
+          </div>
+        </div>
+      </div>
+      <!-- By subsystem -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><i class="ph-stack"></i> By Subsystem (top 8)</div></div>
+        <div v-if="!hasKeys(stats.by_subsystem)" class="empty-state"><p>No data</p></div>
+        <div v-else>
+          <div class="hbar-row" v-for="row in sortedCounts(stats.by_subsystem).slice(0,8)" :key="row.k">
+            <span class="hbar-label" :title="row.k">{{ row.k }}</span>
+            <div class="hbar-track"><div class="hbar-fill" :style="{ width: pctOf(row.v, stats.by_subsystem) + '%' }"></div></div>
+            <span class="hbar-cnt">{{ row.v }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="panel">
+      <div class="panel-arc panel-arc-br"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-clock-counter-clockwise"></i> Recent Activity</div>
+        <button class="btn btn-ghost btn-sm" @click="go('history')">View All <i class="ph-arrow-right"></i></button>
+      </div>
+      <div class="table-container">
+        <table class="tron-table">
+          <thead><tr><th>Time</th><th>Finding</th><th>Change</th><th>Actor</th></tr></thead>
+          <tbody>
+            <tr v-for="r in (stats.recent || [])" :key="r.id" class="clickable" @click="openDetail(r.finding_id)">
+              <td style="white-space: nowrap;">{{ formatTime(r.ts) }}</td>
+              <td><span class="finding-slug">{{ r.slug }}</span> <span style="color: var(--text-secondary);">— {{ r.title }}</span></td>
+              <td>
+                <span class="chip-label">{{ r.field }}:</span>
+                <span class="old" style="color: var(--text-dim);">{{ truncate(r.old_value, 18) || '∅' }}</span>
+                <span style="color: var(--cyan);"> → </span>
+                <span style="color: var(--green);">{{ truncate(r.new_value, 18) || '∅' }}</span>
+              </td>
+              <td><span class="badge" :class="r.actor==='user' ? 'badge-info' : 'badge-violet'">{{ r.actor }}</span></td>
+            </tr>
+            <tr v-if="!(stats.recent || []).length">
+              <td colspan="4"><div class="empty-state"><i class="ph-pulse"></i><p>No recent activity</p></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== ANALYTICS ==================== -->
+  <main class="app-main" v-if="page==='analytics'">
+    <div class="kpi-grid">
+      <div class="kpi-tile" v-for="k in charts.kpis" :key="k.key">
+        <div class="kpi-label">{{ k.label }}</div>
+        <div class="kpi-value">{{ k.value }}{{ k.unit || '' }}</div>
+        <div class="kpi-delta">{{ k.delta }}</div>
+        <canvas class="kpi-spark" :id="'kpi-'+k.key+'-spark'"></canvas>
+      </div>
+    </div>
+    <div class="analytics-grid">
+      <div class="chart-panel chart-span-2"><div class="panel-title">Findings Opened vs Resolved</div>
+        <div class="chart-canvas-wrap tall"><canvas id="chart-trend"></canvas></div></div>
+      <div class="chart-panel"><div class="panel-title">Severity Mix</div>
+        <div class="chart-canvas-wrap"><canvas id="chart-severity"></canvas></div></div>
+      <div class="chart-panel"><div class="panel-title">Open-Finding Age</div>
+        <div class="chart-canvas-wrap"><canvas id="chart-age"></canvas></div></div>
+      <div class="chart-panel chart-span-2"><div class="panel-title">Findings by Subsystem (top 8)</div>
+        <div class="chart-canvas-wrap tall"><canvas id="chart-subsystem"></canvas></div></div>
+    </div>
+  </main>
+
+  <!-- ==================== ROADMAP ==================== -->
+  <main class="app-main" v-if="page==='roadmap'">
+
+    <!-- Phase-flow visualization: ordering, overlaps, interactions, live AI position -->
+    <div class="panel">
+      <div class="panel-arc panel-arc-tl"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-map-trifold"></i> Roadmap to Production <span class="panel-sub">· Surface 2 RT · Tegra 4 · Win 8.1</span></div>
+        <span class="badge" :class="overallPct>=100 ? 'badge-success-strong' : 'badge-info'">{{ overallPct }}% production-ready</span>
+      </div>
+      <div v-if="!phases.length" class="page-loader"><div class="loading-spinner"></div> Loading roadmap…</div>
+      <div v-else class="phase-rail-wrap">
+        <!-- viewBox hardcoded to RAIL_W×RAIL_H (constants): petite-vue can't bind the
+             read-only SVG `viewBox` property, so a static attribute is required.
+             Keep "0 0 <RAIL_W> <RAIL_H>" in sync with the JS constants (1366×330). -->
+        <svg class="phase-rail" viewBox="0 0 1366 330" preserveAspectRatio="xMinYMin meet">
+          <defs>
+            <!-- Tron halo: wide soft bloom + tight glow + crisp core on top. -->
+            <filter id="tronGlow" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur stdDeviation="6.5" result="outer"></feGaussianBlur>
+              <feGaussianBlur stdDeviation="2.4" result="inner"></feGaussianBlur>
+              <feMerge>
+                <feMergeNode in="outer"></feMergeNode>
+                <feMergeNode in="inner"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- overlap arcs (above the lane): orthogonal wall + light-cycle tracer; speed+glow scale with relationship strength -->
+          <g v-for="(o,i) in overlapArcs" :key="'ov'+i">
+            <path class="pr-overlap" :d="o.d" :stroke="o.color" pathLength="100"></path>
+            <path class="pr-trace pr-trace-ov" :d="o.d" :stroke="o.color" pathLength="100" :style="{ animationDuration: o.dur+'s', strokeWidth: o.width, strokeDasharray: o.dash, animationDelay: (i*0.3)+'s' }"></path>
+          </g>
+          <!-- dependency arrows (below the lane): orthogonal wall + tracer + arrowhead; speed+glow scale with relationship strength -->
+          <g v-for="(d,i) in depArrows" :key="'dep'+i">
+            <path class="pr-dep" :d="d.d" :stroke="d.color" pathLength="100"></path>
+            <path class="pr-trace pr-trace-dep" :d="d.d" :stroke="d.color" pathLength="100" :style="{ animationDuration: d.dur+'s', strokeWidth: d.width, strokeDasharray: d.dash, animationDelay: (i*0.25)+'s' }"></path>
+            <polygon :points="d.head" :fill="d.color" :style="{ opacity: 1, filter: 'drop-shadow(0 0 7px '+d.color+')' }"></polygon>
+          </g>
+          <!-- phase nodes -->
+          <g v-for="p in phaseNodes" :key="p.key" style="cursor:pointer" @click="scrollPhase(p.key)">
+            <!-- no :class here — petite-vue corrupts className on SVG; active glow via :style -->
+            <rect class="pr-node-rect" :x="p.x" :y="railNodeY"
+                  :width="nodeW" :height="nodeH" rx="11" :fill="p.fillBg" :stroke="p.color"
+                  :stroke-width="p.status==='active' ? 2 : 1.2"
+                  :style="{ opacity: p.status==='planned' ? 0.78 : 1, filter: p.status==='active' ? 'drop-shadow(0 0 6px '+p.color+')' : 'none' }"></rect>
+            <text class="pr-key" :x="p.x+13" :y="railNodeY+24" :fill="p.color" font-size="15">{{ p.key }}</text>
+            <text class="pr-name" :x="p.x+13" :y="railNodeY+42" fill="#e0e6f0" font-size="10.5">{{ railTrunc(p.name,19) }}</text>
+            <text class="pr-name" :x="p.x+13" :y="railNodeY+57" fill="#8899bb" font-size="9">{{ p.rollup.total }} items · {{ p.pct }}%</text>
+            <rect :x="p.x+13" :y="railNodeY+nodeH-15" :width="nodeW-26" height="6" rx="3" fill="#0e0e20" stroke="#1a1a3e"></rect>
+            <rect :x="p.x+13" :y="railNodeY+nodeH-15" :width="(nodeW-26)*p.pct/100" height="6" rx="3" :fill="p.color"></rect>
+          </g>
+          <!-- live AI markers ("you are here"): Tron identity disc + radar ping -->
+          <g v-for="m in agentMarkers" :key="'ag'+m.name">
+            <circle class="pr-agent-ping" :cx="m.x" :cy="m.y" r="7" :stroke="m.color" fill="none" :style="{ animationDelay: m.delay, filter: 'drop-shadow(0 0 4px '+m.color+')' }"></circle>
+            <circle class="pr-agent-disc" :cx="m.x" :cy="m.y" r="7" :fill="m.color" :style="{ filter: 'drop-shadow(0 0 7px '+m.color+') drop-shadow(0 0 16px '+hexA(m.color,0.5)+')' }"></circle>
+            <text class="pr-agent-text" :x="m.x" :y="m.y+3.1" text-anchor="middle" font-size="8.5" font-weight="700" fill="#06060e">{{ m.initial }}</text>
+            <title>{{ m.name }} — {{ m.activity }}</title>
+          </g>
+        </svg>
+      </div>
+      <div class="rail-legend" v-if="phases.length">
+        <span class="rl"><span class="ln dep"></span> depends on (→ node)</span>
+        <span class="rl"><span class="ln ov"></span> overlaps / concurrent</span>
+        <span class="rl"><span class="dot"></span> live AI working here</span>
+        <span class="rl"><i class="ph-lightning" style="color:var(--cyan)"></i> faster &amp; brighter trace = stronger link</span>
+      </div>
+    </div>
+
+    <!-- compact issue filter (scopes the issue lists inside each phase) -->
+    <div class="panel toolbar-panel">
+      <div class="toolbar-row">
+        <div class="sev-chips">
+          <div class="sev-chip sev-all" :class="{active: sevFilter==='all'}" @click="setSev('all')" :title="'All severities · '+sevChipCount('all')" role="button" tabindex="0"><i class="ph-funnel"></i><span class="sr-only">All severities</span> <span class="cnt">{{ sevChipCount('all') }}</span></div>
+          <div v-for="s in sevOrder" :key="s" class="sev-chip" :class="['sev-'+s, {active: sevFilter===s}]" @click="setSev(s)" :title="s+' · '+sevChipCount(s)" role="button" tabindex="0"><i :class="sevIcon(s)"></i><span class="sr-only">{{ s }}</span> <span class="cnt">{{ sevChipCount(s) }}</span></div>
+        </div>
+        <input id="sharedSearch" class="tron-input grow" placeholder="Filter issues across phases — title / slug / location / evidence…  (press /)" v-model="searchRaw" @input="onSearchInput">
+        <select class="tron-select" v-model="statusFilter" @change="persist()">
+          <option value="">All Status</option>
+          <option v-for="s in meta.statuses" :key="s" :value="s">{{ s }}</option>
+        </select>
+        <button class="btn btn-sm" :class="quickWins ? 'btn-toggle-on' : 'btn-ghost'" @click="toggleQuickWins()" title="Open/in-progress/deferred · effort S · critical or high"><i class="ph-lightning"></i> Quick-Wins</button>
+        <button class="btn btn-violet btn-sm" @click="exportCsv()"><i class="ph-download-simple"></i> CSV</button>
+        <button class="btn btn-ghost btn-sm" @click="resetFilters()"><i class="ph-x-circle"></i> Reset</button>
+        <button class="btn btn-ghost btn-sm" @click="toggleAllPhases()"><i :class="anyPhaseOpen ? 'ph-arrows-in-line-vertical' : 'ph-arrows-out-line-vertical'"></i> {{ anyPhaseOpen ? 'Collapse' : 'Expand' }} all</button>
+      </div>
+    </div>
+
+    <!-- PHASE PANELS -->
+    <div v-if="!phases.length" class="panel"><div class="page-loader"><div class="loading-spinner"></div> Loading…</div></div>
+    <div v-else>
+      <div v-for="p in phases" :key="p.key" class="phase-panel" :id="'phase-'+p.key" :style="{ borderLeftColor: p.color }">
+        <div class="phase-head" @click="togglePhase(p.key)">
+          <div class="phase-id-col">
+            <div class="phase-badge" :style="{ background: hexA(p.color,0.16), color: p.color, border: '1px solid '+p.color, boxShadow: '0 0 14px '+hexA(p.color,0.5)+', inset 0 0 10px '+hexA(p.color,0.18) }"><i :class="p.icon"></i></div>
+            <div class="phase-titles">
+              <span class="phase-name">{{ p.key }} · {{ p.name }}</span>
+              <span class="phase-tagline">{{ p.tagline }}</span>
+            </div>
+          </div>
+          <div class="phase-prog-col">
+            <div class="phase-prog-track"><div class="phase-prog-fill" :style="{ width: p.pct+'%', background: p.color, boxShadow: '0 0 7px '+hexA(p.color,0.75)+', 0 0 15px '+hexA(p.color,0.4) }"></div></div>
+            <span class="phase-prog-pct" :style="{ color: p.color }">{{ p.pct }}%</span>
+          </div>
+          <div class="phase-meta-col">
+            <span class="badge badge-danger-strong" v-if="p.rollup.open_crit_high>0" :title="p.rollup.open_crit_high+' open critical/high'"><i class="ph-warning-octagon"></i> {{ p.rollup.open_crit_high }}</span>
+            <span class="chip">{{ p.rollup.done }}/{{ p.rollup.total }} done</span>
+            <span class="phase-status-chip" :class="p.status">{{ p.status }}</span>
+            <span class="agent-phase-chip" v-for="a in phaseAgents(p.key)" :key="a.name" :style="{ borderColor:a.color, color:a.color }" :title="a.name+' — '+a.activity">
+              <span class="st-dot" style="width:6px;height:6px;border-radius:50%;" :style="{ background:a.color }"></span>{{ a.name }}
+            </span>
+            <i class="phase-caret" :class="isPhaseOpen(p.key) ? 'ph-caret-up' : 'ph-caret-down'"></i>
+          </div>
+        </div>
+
+        <div class="phase-body" v-if="isPhaseOpen(p.key)">
+          <div class="phase-goal">{{ p.goal }}</div>
+          <div class="phase-cols">
+            <div>
+              <div class="mini-label"><i class="ph-flag-checkered"></i> Exit Criteria</div>
+              <div class="exit-item" v-for="(c,ci) in p.exit_criteria" :key="ci"><i class="ph-check-circle"></i><span>{{ c }}</span></div>
+            </div>
+            <div>
+              <div class="mini-label"><i class="ph-arrows-left-right"></i> Phase Interactions</div>
+              <div class="interaction-chips" style="margin-bottom:14px;">
+                <span class="ix-chip" v-for="dep in p.depends_on" :key="'d'+dep" @click="scrollPhase(dep)" title="depends on this phase"><i class="ph-arrow-bend-left-up"></i><span class="ix-k" :style="{ color: phaseColor(dep) }">{{ dep }}</span> dependency</span>
+                <span class="ix-chip" v-for="ov in p.overlaps" :key="'o'+ov" @click="scrollPhase(ov)" title="runs concurrently / overlaps"><i class="ph-arrows-merge"></i><span class="ix-k" :style="{ color: phaseColor(ov) }">{{ ov }}</span> overlap</span>
+                <span v-if="!p.depends_on.length && !p.overlaps.length" style="color:var(--text-dim);font-size:.85rem;">No cross-phase dependencies — can start immediately.</span>
+              </div>
+              <div class="mini-label"><i class="ph-git-branch"></i> Workstreams <span style="color:var(--text-dim);text-transform:none;letter-spacing:0;">· one AI each, parallel</span></div>
+              <div class="ws-list">
+                <div class="ws-row" v-for="w in p.workstreams" :key="w.key" :class="{ live: isWsLive(w) }">
+                  <span class="ws-agent" v-if="w.agent" :style="{ borderColor: agentColor(w.agent), color: agentColor(w.agent) }">
+                    <span class="a-dot" :class="{ working: isWsLive(w) }" :style="{ background: agentColor(w.agent) }"></span>{{ w.agent }}
+                  </span>
+                  <span class="ws-agent" v-else :style="{ borderColor: 'var(--text-dim)', color: 'var(--text-dim)' }" title="No worker has claimed this workstream yet">
+                    <span class="a-dot" :style="{ background: 'var(--text-dim)' }"></span>unassigned
+                  </span>
+                  <div class="ws-main">
+                    <div class="ws-name">{{ w.name }}</div>
+                    <div class="ws-desc">{{ w.description }}</div>
+                    <div class="ws-now" v-if="isWsLive(w)"><i class="ph-broadcast"></i> {{ agentByName(w.agent).activity }}</div>
+                  </div>
+                  <div class="ws-prog"><div class="ws-prog-track"><div class="ws-prog-fill" :style="{ width: wsProgress(w)+'%', background: agentColor(w.agent), boxShadow: '0 0 6px '+hexA(agentColor(w.agent),0.7)+', 0 0 12px '+hexA(agentColor(w.agent),0.35) }"></div></div></div>
+                </div>
+                <div v-if="!p.workstreams.length" style="color:var(--text-dim);font-size:.85rem;">No workstreams defined.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- issues in this phase: compact accordion overview -->
+          <div class="mini-label" style="margin-top:16px;"><i class="ph-list-checks"></i> Issues in this phase <span style="color:var(--text-dim);text-transform:none;letter-spacing:0;">· {{ issuesForPhase(p.key).length }} match filter</span></div>
+          <div v-if="issuesForPhase(p.key).length===0" style="color:var(--text-dim);font-size:.9rem;padding:8px 0;">No issues match the current filter in this phase.</div>
+          <div v-else class="issue-list">
+            <div v-for="f in issuesForPhase(p.key)" :key="f.id" class="issue-row">
+              <div class="istripe" :style="{ background: sevColor(f.severity) }"></div>
+              <div class="issue-head" @click="toggleIssue(f.id)">
+                <span class="issue-sev-dot" :style="{ background: sevColor(f.severity) }"></span>
+                <span class="issue-slug">{{ f.slug }}</span>
+                <span class="issue-title">{{ f.title }}</span>
+                <span class="badge" :class="statusBadge(f.status)">{{ f.status }}</span>
+                <i class="issue-caret" :class="isIssueOpen(f.id) ? 'ph-caret-up' : 'ph-caret-down'"></i>
+              </div>
+              <div class="issue-body" v-if="isIssueOpen(f.id)">
+                <div class="finding-section" v-if="f.location"><div class="sec-label">Location</div><div class="issue-loc">{{ f.location }}</div></div>
+                <div class="finding-section" v-if="f.evidence"><div class="sec-label">Evidence</div><div class="sec-text">{{ truncate(f.evidence, 460) }}</div></div>
+                <div class="finding-section" v-if="f.recommendation"><div class="sec-label">Recommendation</div><div class="sec-text">{{ truncate(f.recommendation, 460) }}</div></div>
+                <div class="finding-section" v-if="!f.evidence && !f.recommendation && !f.device_impact"><div class="sec-text" style="color: var(--text-dim);">No detailed description recorded.</div></div>
+                <div class="chip-row">
+                  <span class="chip"><span class="chip-label">Sev</span> <span class="chip-val">{{ f.severity }}</span></span>
+                  <span class="chip"><span class="chip-label">Effort</span> <span class="chip-val">{{ f.effort || '—' }}</span></span>
+                  <span class="chip"><span class="chip-label">Risk</span> <span class="chip-val">{{ f.risk || '—' }}</span></span>
+                  <span class="chip"><span class="chip-label">Subsystem</span> <span class="chip-val">{{ f.subsystem || '—' }}</span></span>
+                  <span class="badge badge-magenta" v-if="f.feature_serves_no_purpose"><i class="ph-prohibit"></i> serves no purpose</span>
+                </div>
+                <div class="resolution-block" v-if="['resolved','verified','wont_fix'].includes(f.status) && f.resolution"><div class="sec-label">Resolution</div><div class="sec-text">{{ f.resolution }}</div></div>
+                <div class="finding-actions">
+                  <!-- Actionable rows: Queue is the state-derived primary; terminal rows: Reopen (adjacent v-if/v-else) -->
+                  <button class="btn btn-sm" v-if="!['resolved','verified','wont_fix'].includes(f.status)" :class="isQueued(f.slug) ? 'btn-toggle-on' : (f.workflow==='VALID' ? 'btn-primary' : 'btn-violet')" @click.stop="queueRowAction(f)"><i :class="isQueued(f.slug) ? 'ph-check' : (f.workflow==='VALID' ? 'ph-rocket-launch' : 'ph-stack-plus')"></i> {{ isQueued(f.slug) ? 'Queued' : (f.workflow==='VALID' ? 'Queue to run' : 'Queue') }}</button>
+                  <button class="btn btn-ghost btn-sm" v-else @click.stop="quickStatus(f, 'open')"><i class="ph-arrow-counter-clockwise"></i> Reopen</button>
+                  <button class="btn btn-primary btn-sm" @click.stop="openIssue(f.id)"><i class="ph-arrows-out"></i> Open</button>
+                  <details class="action-menu">
+                    <summary class="btn btn-ghost btn-icon"><i class="ph-dots-three"></i></summary>
+                    <div class="am-panel">
+                      <button v-for="(it,i) in findingRowOverflow(f)" :key="i" class="btn btn-ghost btn-sm" @click.stop="runFindingAction(f,it); $event.target.closest('details.action-menu').open=false"><i :class="it.icon"></i> {{ it.verb }}</button>
+                      <button v-if="['resolved','verified','wont_fix'].includes(f.status)" class="btn btn-ghost btn-sm" @click.stop="queueRowAction(f); $event.target.closest('details.action-menu').open=false"><i class="ph-stack-plus"></i> {{ isQueued(f.slug) ? 'Dequeue' : 'Re-queue' }}</button>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Queue every still-open issue shown for this phase in one click. -->
+          <div v-if="queueableInPhase(p.key).length" style="margin-top:10px; display:flex; justify-content:flex-end;">
+            <button class="btn btn-violet btn-sm" @click="queueAllInPhase(p.key)" :disabled="queueAllBusy">
+              <i class="ph-stack-plus"></i> Queue All ({{ queueableInPhase(p.key).length }})
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== MISSION CONTROL ==================== -->
+  <main class="app-main" v-if="page==='mission'">
+    <div class="panel">
+      <div class="panel-arc panel-arc-tl"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-robot"></i> Live AI Agents <span class="panel-sub">· real-time, parallel work streams</span></div>
+        <span class="badge" :class="live ? 'badge-success' : 'badge-neutral'"><span class="sdot" :style="{ background: live ? 'var(--green)' : 'var(--text-dim)' }"></span>{{ live ? 'streaming' : 'offline' }}</span>
+      </div>
+      <div v-if="!liveAgents.length" class="empty-state"><i class="ph-robot"></i><p>No agents reporting in</p></div>
+      <div v-else class="mc-agents">
+        <div v-for="a in liveAgents" :key="a.name" class="agent-card" :class="{ working: a.status==='working' }" :style="{ borderTopColor: a.color }">
+          <div class="agent-card-head">
+            <div class="agent-avatar" :style="{ background: a.color }">{{ (a.name||'?')[0] }}</div>
+            <div class="agent-id">
+              <div class="agent-name">{{ a.display || a.name }}</div>
+              <span class="agent-state" :class="a.status"><span class="st-dot"></span>{{ a.status }}</span>
+            </div>
+          </div>
+          <div class="agent-where">
+            <span class="agent-phase-chip" v-if="a.phase_key" :style="{ borderColor: phaseColor(a.phase_key), color: phaseColor(a.phase_key) }"><i :class="phaseIcon(a.phase_key)"></i>{{ a.phase_key }} · {{ phaseName(a.phase_key) }}</span>
+          </div>
+          <div class="agent-where" v-if="a.workstream_key"><span class="chip"><i class="ph-git-branch"></i>{{ wsName(a.workstream_key) }}</span></div>
+          <div class="agent-activity">{{ a.activity || '—' }}</div>
+          <div class="agent-prog">
+            <div class="agent-prog-track"><div class="agent-prog-fill" :style="{ width: (a.progress||0)+'%', background: a.color, boxShadow: '0 0 6px '+hexA(a.color,0.75)+', 0 0 13px '+hexA(a.color,0.4) }"></div></div>
+            <span class="agent-prog-pct">{{ a.progress||0 }}%</span>
+          </div>
+          <div class="agent-foot" style="margin-top:10px;">
+            <span class="agent-finding" v-if="a.finding_slug" @click="openIssue(a.finding_slug)"><i class="ph-bug"></i> {{ a.finding_slug }}</span>
+            <span class="agent-hb"><i class="ph-pulse"></i> {{ timeAgo(a.last_heartbeat) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SPRINT QUEUE ===== -->
+    <div class="panel">
+      <div class="panel-arc panel-arc-tl"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-stack-plus"></i> Sprint Queue <span class="panel-sub">· {{ queue.length }} queued</span></div>
+        <div class="queue-toolbar">
+          <span class="dispatch-meta" v-if="queue.length"><i class="ph-cpu"></i> {{ dispatchModel }} · <span :class="reactClass(dispatchReasoning)">{{ dispatchReasoning }}</span></span>
+          <button class="btn btn-ghost btn-sm" @click="clearQueue()" v-if="queue.length"><i class="ph-trash"></i> Clear</button>
+          <button class="btn btn-primary btn-sm" @click="dispatchMission()" :disabled="!queue.length || dispatching"><i class="ph-rocket-launch"></i> {{ dispatching ? 'Dispatching…' : 'Dispatch Mission' }}</button>
+        </div>
+      </div>
+      <div v-if="!queue.length" class="empty-state"><i class="ph-stack-plus"></i><p>Queue is empty — add issues from the Roadmap (the <b>Queue</b> button on each issue) or the issue popup.</p></div>
+      <div v-else>
+        <p class="dispatch-note"><i class="ph-info"></i> Dispatch creates a Mission from these items; then <b>Spawn</b> a <code>claude</code> CLI worker on the mission card to run it (implement → build ARM32 → deploy → smoke-test on device → debug) in one live session. Reasoning escalates to <b>Ultracode</b> when the worst effort is Significant (L) or higher. Items overlapping an in-progress mission are returned to the backlog with a note.</p>
+        <div class="issue-list">
+          <div v-for="(q,i) in queue" :key="q.slug" class="issue-row queue-row">
+            <div class="istripe" :style="{ background: sevColor(q.severity) }"></div>
+            <div class="issue-head" style="cursor:default;">
+              <span class="queue-pos">{{ i+1 }}</span>
+              <span class="issue-sev-dot" :style="{ background: sevColor(q.severity) }"></span>
+              <span class="issue-slug" @click="openIssue(q.slug)" style="cursor:pointer;">{{ q.slug }}</span>
+              <span class="issue-title">{{ q.title }}</span>
+              <span class="chip"><span class="chip-label">eff</span> <span class="chip-val">{{ q.effort || '—' }}</span></span>
+              <span class="badge" :class="statusBadge(q.status)">{{ q.status }}</span>
+              <button class="btn btn-ghost btn-sm icon-btn" @click="queueMove(i,-1)" :disabled="i===0" title="Move up"><i class="ph-arrow-up"></i></button>
+              <button class="btn btn-ghost btn-sm icon-btn" @click="queueMove(i,1)" :disabled="i===queue.length-1" title="Move down"><i class="ph-arrow-down"></i></button>
+              <button class="btn btn-danger btn-sm icon-btn" @click="queueRemove(q.slug)" title="Remove from queue"><i class="ph-x"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MISSIONS ===== -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-rocket"></i> Missions <span class="panel-sub">· {{ missions.length }}</span></div>
+      </div>
+      <div v-if="!missions.length" class="empty-state"><i class="ph-rocket"></i><p>No missions dispatched yet</p></div>
+      <div v-else class="mission-list">
+        <div v-for="m in missionsSorted" :key="m.key" class="mission-card" :class="'ms-'+m.status">
+          <div class="mission-head" @click="toggleMission(m.key)">
+            <span class="mission-key">{{ m.key }}</span>
+            <span class="mission-title">{{ m.title }}</span>
+            <span class="badge" :class="missionBadge(m.status)">{{ missionLabel(m.status) }}</span>
+            <span class="agent-phase-chip mission-model"><i class="ph-cpu"></i>{{ m.model || 'Opus 4.8' }} · <span :class="reactClass(m.reasoning)">{{ m.reasoning }}</span></span>
+            <span class="agent-phase-chip mission-model" v-if="m.reasoning === 'Ultracode' && m.bulk_effort" title="Ultracode sub-agent effort tiers"><i class="ph-users-three"></i>bulk:{{ m.bulk_effort }} · verify:{{ m.verify_effort }}</span>
+            <span class="chip" v-if="m.agent"><i class="ph-robot"></i>{{ m.agent }}</span>
+            <span class="chip"><span class="chip-label">items</span> <span class="chip-val">{{ (m.item_counts && m.item_counts.done || 0) }}/{{ m.item_total }}</span></span>
+            <!-- ONE derived status pill (non-interactive indicator; folds the 5 HUD chips) -->
+            <span class="status-pill" :class="missionView(m,'card').pillClass" :title="'Lifecycle: '+ls(m.key).lifecycle"><i :class="missionView(m,'card').icon"></i>{{ missionView(m,'card').label }}</span>
+            <!-- collapsed-card quick-action (act-where-surfaced) -->
+            <button class="btn btn-ghost btn-icon" v-if="missionView(m,'card').headAction" @click.stop="act(missionView(m,'card').headAction.act, m.key)" :title="missionView(m,'card').headAction.verb"><i :class="missionView(m,'card').headAction.icon"></i></button>
+            <span class="counter-pill" v-if="ls(m.key).cost_usd>0" :class="'has'" title="cost · turns"><i class="ph-coins"></i>${{ (ls(m.key).cost_usd||0).toFixed(2) }} · {{ ls(m.key).turns||0 }}t</span>
+            <i class="issue-caret" :class="isMissionOpen(m.key) ? 'ph-caret-up' : 'ph-caret-down'"></i>
+          </div>
+          <div class="mission-body" v-if="isMissionOpen(m.key)">
+            <div class="mission-meta-grid">
+              <span><span class="ml">effort</span> {{ m.effort || '—' }} · {{ m.effort_band || '—' }}</span>
+              <span><span class="ml">dispatched</span> {{ formatTime(m.dispatched_at) }}</span>
+              <span v-if="m.started_at"><span class="ml">started</span> {{ formatTime(m.started_at) }}</span>
+              <span v-if="m.completed_at"><span class="ml">completed</span> {{ formatTime(m.completed_at) }}</span>
+            </div>
+
+            <!-- ===== TRON HUD (render-only projection of live_state) ===== -->
+            <!-- Activity ticker -->
+            <div class="activity-ticker" v-if="ls(m.key).activity">
+              <i class="ph-broadcast at-tick"></i>
+              <span class="at-text">{{ m.agent || 'worker' }} · {{ ls(m.key).activity }}</span>
+            </div>
+
+            <!-- Approval pill (PreToolUse ask gate) -->
+            <div class="approval-pill" v-if="ls(m.key).approval_pending">
+              <i class="ph-hand-palm"></i>
+              <span>Approval needed · {{ ls(m.key).approval_pending.tool_name }}</span>
+              <span class="ap-cmd" v-if="ls(m.key).approval_pending.command">{{ ls(m.key).approval_pending.command }}</span>
+              <button class="btn btn-success btn-sm" @click.stop="approveGate(m.key, ls(m.key).approval_pending.gate_id, 'allow')"><i class="ph-check"></i> Approve</button>
+              <button class="btn btn-danger btn-sm" @click.stop="approveGate(m.key, ls(m.key).approval_pending.gate_id, 'deny')"><i class="ph-x"></i> Deny</button>
+            </div>
+
+            <!-- Plan card (Plan phase) -->
+            <div class="plan-card" v-if="ls(m.key).plan">
+              <div class="hud-sec-label"><i class="ph-list-checks"></i> Proposed Plan</div>
+              <div class="plan-steps">
+                <span class="plan-step-wrap" v-for="(st, i) in (ls(m.key).plan.steps || [])" :key="i" style="display:inline-flex;align-items:center;">
+                  <span class="plan-conn" v-if="i>0"></span>
+                  <span class="plan-step"><span class="ps-n">{{ i+1 }}</span><i :class="lifecycleIcon({lifecycle: stageToLifecycle((st && st.stage) || 'implement')})"></i>{{ (st && st.label) || st }}</span>
+                </span>
+              </div>
+              <div class="plan-files" v-if="(ls(m.key).plan.files || []).length">
+                <span class="fc-chip" v-for="(f, i) in ls(m.key).plan.files.slice(0,8)" :key="i"><i class="ph-file"></i>{{ baseName(f) }}</span>
+              </div>
+              <div class="pc-risk" v-if="ls(m.key).plan.risk"><i class="ph-warning"></i>{{ ls(m.key).plan.risk }}</div>
+            </div>
+
+            <!-- Lifecycle stepper (6-node orthogonal light-cycle SVG, hardcoded viewBox) -->
+            <div class="hud-sec">
+              <div class="hud-sec-label"><i class="ph-flow-arrow"></i> Lifecycle</div>
+            </div>
+            <div class="stepper-wrap">
+              <svg class="lifecycle-stepper" viewBox="0 0 600 70" preserveAspectRatio="xMinYMin meet">
+                <defs>
+                  <filter id="lsGlow" x="-60%" y="-60%" width="220%" height="220%">
+                    <feGaussianBlur stdDeviation="2.2"></feGaussianBlur>
+                  </filter>
+                </defs>
+                <!-- orthogonal connectors between nodes -->
+                <g>
+                  <g v-for="(seg, i) in stepperSegments(ls(m.key))" :key="'seg'+i">
+                    <polyline class="ls-conn" :points="seg.points" :style="{ stroke: seg.color }"></polyline>
+                    <polyline class="ls-trace" v-if="seg.active" :points="seg.points" :style="{ stroke: seg.color }"></polyline>
+                  </g>
+                </g>
+                <!-- nodes -->
+                <g v-for="(nd, i) in stepperNodes(ls(m.key))" :key="'nd'+i">
+                  <rect class="ls-node-rect" :x="nd.x" :y="nd.y" width="44" height="30" rx="6"
+                        :style="{ fill: nd.fill, stroke: nd.stroke, strokeWidth: 1.4, color: nd.stroke, filter: nd.reached ? 'drop-shadow(0 0 5px '+nd.stroke+')' : 'none' }"></rect>
+                  <text class="ls-node-label" :x="nd.x+22" :y="nd.y+19" text-anchor="middle" :style="{ fill: nd.stroke }">{{ nd.short }}</text>
+                </g>
+              </svg>
+            </div>
+
+            <!-- Build / Deploy / Smoke triad -->
+            <div class="triad">
+              <span class="triad-chip" :class="'tc-'+triadState(ls(m.key),'build')">
+                <i class="tlead" :class="triadIcon(ls(m.key),'build','ph-hammer')"></i>
+                <span class="tc-state">{{ triadState(ls(m.key),'build') }}</span>
+                <span class="tc-target">build</span>
+              </span>
+              <span class="triad-chip" :class="'tc-'+triadState(ls(m.key),'deploy')">
+                <i class="tlead" :class="triadIcon(ls(m.key),'deploy','ph-upload')"></i>
+                <span class="tc-state">{{ triadState(ls(m.key),'deploy') }}</span>
+                <span class="tc-target">deploy</span>
+              </span>
+              <span class="triad-chip" :class="'tc-'+triadState(ls(m.key),'smoke')">
+                <i class="tlead" :class="triadIcon(ls(m.key),'smoke','ph-device-tablet')"></i>
+                <span class="tc-state">{{ triadState(ls(m.key),'smoke') }}</span>
+                <span class="tc-target">smoke</span>
+              </span>
+            </div>
+
+            <!-- counters: items / bugs / blockers / files -->
+            <div class="hud-pill-row">
+              <span class="counter-pill" :class="(ls(m.key).items.done+ls(m.key).items.total)>0 ? 'has' : ''"><i class="ph-list-checks"></i>{{ ls(m.key).items.done }}/{{ ls(m.key).items.total }} items</span>
+              <span class="bugs-pill" :class="ls(m.key).bugs_found>0 ? 'has' : ''"><i class="ph-bug"></i>{{ ls(m.key).bugs_found || 0 }} bugs</span>
+              <span class="blockers-pill" :class="(ls(m.key).blockers && ls(m.key).blockers.length) ? 'blocked' : ''" :title="blockerReason(ls(m.key))">
+                <i :class="(ls(m.key).blockers && ls(m.key).blockers.length) ? 'ph-warning-octagon' : 'ph-shield-check'"></i>{{ (ls(m.key).blockers && ls(m.key).blockers.length) ? 'Blocked' : 'No Blockers' }}
+              </span>
+              <span class="counter-pill" :class="ls(m.key).files_changed_count>0 ? 'has' : ''" v-if="ls(m.key).files_changed_count>0"><i class="ph-file-diff"></i>{{ ls(m.key).files_changed_count }} files</span>
+            </div>
+
+            <!-- file-change chips -->
+            <div class="plan-files" v-if="(ls(m.key).files_changed || []).length">
+              <span class="fc-chip" v-for="(f, i) in ls(m.key).files_changed.slice(0,10)" :key="'fc'+i"><i class="ph-files"></i>{{ baseName(f) }}</span>
+            </div>
+
+            <!-- Tool-call glyph ticker -->
+            <div class="glyph-ticker" v-if="(ls(m.key).tools_recent || []).length">
+              <i class="ph-pulse gt-lead"></i>
+              <span class="glyph" v-for="(t, i) in ls(m.key).tools_recent" :key="t.id || ('g'+i)"
+                    :class="t.ok===false ? 'gl-err' : (t.ok===true ? 'gl-ok' : 'gl-pending')" :title="t.label">
+                <i :class="familyIcon(t.family)"></i>
+              </span>
+            </div>
+
+            <!-- Token / cost gauge -->
+            <div class="cost-gauge" v-if="ls(m.key).cost_usd>0 || ls(m.key).turns>0">
+              <svg width="54" height="54" viewBox="0 0 54 54">
+                <path class="cg-arc-track" d="M 27 50 A 23 23 0 1 1 27 4"></path>
+                <path class="cg-arc-cache" d="M 27 50 A 23 23 0 1 1 27 4" pathLength="100" :style="{ strokeDasharray: cacheArc(ls(m.key)) }"></path>
+                <path class="cg-arc-fill" d="M 27 50 A 23 23 0 1 1 27 4" pathLength="100" :style="{ strokeDasharray: costArc(ls(m.key)) }"></path>
+              </svg>
+              <div class="cg-stats">
+                <span class="cg-cost"><i class="ph-coins"></i> ${{ (ls(m.key).cost_usd||0).toFixed(2) }}</span>
+                <span class="cg-sub">{{ ls(m.key).turns||0 }} turns · {{ tokFmt((ls(m.key).tokens||{}).input) }} in / {{ tokFmt((ls(m.key).tokens||{}).output) }} out</span>
+                <span class="cg-sub" v-if="ls(m.key).next_action">→ {{ ls(m.key).next_action }}</span>
+              </div>
+            </div>
+
+            <div class="mission-items" v-if="missionDetail[m.key]">
+              <div v-for="it in missionDetail[m.key].items" :key="it.finding_slug" class="mission-item-row" :class="{ removed: it.status==='removed' }">
+                <span class="badge" :class="missionItemBadge(it.status)">{{ missionItemLabel(it.status) }}</span>
+                <span class="issue-slug" @click="openIssue(it.finding_slug)" style="cursor:pointer;">{{ it.finding_slug }}</span>
+                <span class="issue-title">{{ it.title || '' }}</span>
+                <span class="mi-reason" v-if="it.removed_reason">— {{ it.removed_reason }}</span>
+              </div>
+            </div>
+            <div class="mission-actions">
+              <button class="btn btn-primary btn-sm" v-if="missionView(m,'card').primary" @click="act(missionView(m,'card').primary.act, m.key)" :disabled="missionView(m,'card').primary.disabled"><i :class="missionView(m,'card').primary.icon"></i> {{ spawning[m.key] ? '…' : missionView(m,'card').primary.verb }}</button>
+              <button class="btn btn-sm" :class="missionView(m,'card').secondary && missionView(m,'card').secondary.act==='stopMission' ? 'btn-danger' : 'btn-primary'" v-if="missionView(m,'card').secondary" @click="act(missionView(m,'card').secondary.act, m.key)" :disabled="missionView(m,'card').secondary.disabled"><i :class="missionView(m,'card').secondary.icon"></i> {{ missionView(m,'card').secondary.verb }}</button>
+              <details class="action-menu" v-if="missionView(m,'card').overflow.length">
+                <summary class="btn btn-ghost btn-icon"><i class="ph-dots-three"></i></summary>
+                <div class="am-panel">
+                  <button v-for="(it,i) in missionView(m,'card').overflow" :key="i" class="btn btn-ghost btn-sm" :class="it.danger?'danger':''" :disabled="it.disabled" @click="act(it.act, m.key); $event.target.closest('details.action-menu').open=false"><i :class="it.icon"></i> {{ it.verb }}</button>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-grid">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><i class="ph-stack"></i> Phase Progress</div><span class="panel-sub">{{ overallPct }}% ready</span></div>
+        <div class="phase-progress-list">
+          <div class="ppl-row" v-for="p in phases" :key="p.key" @click="go('roadmap'); openPhase(p.key)">
+            <span class="ppl-key" :style="{ color: p.color }">{{ p.key }}</span>
+            <span class="ppl-name">{{ p.name }}</span>
+            <div class="ppl-track"><div class="ppl-fill" :style="{ width: p.pct+'%', background: p.color }"></div></div>
+            <span class="ppl-pct">{{ p.pct }}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><i class="ph-pulse"></i> Live Event Stream</div><span class="panel-sub">{{ events.length }} events</span></div>
+        <div v-if="!events.length" class="empty-state"><i class="ph-pulse"></i><p>Waiting for activity…</p></div>
+        <div v-else class="event-feed">
+          <div v-for="e in eventsReversed" :key="e._k" class="event-row" :class="{ fresh: e._fresh }">
+            <div class="event-icon" :style="{ background: hexA(eventColor(e.kind),0.15), color: eventColor(e.kind) }"><i :class="eventIcon(e.kind)"></i></div>
+            <div class="event-main">
+              <span class="event-ref" @click="maybeOpenEvent(e)" style="cursor:pointer;">{{ e.ref }}</span>
+              <div class="event-summary">{{ e.summary }}</div>
+            </div>
+            <span class="event-time">{{ timeAgo(e.ts) }} · {{ e.actor }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== HISTORY ==================== -->
+  <main class="app-main" v-if="page==='history'">
+    <div class="panel">
+      <div class="panel-arc panel-arc-tl"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-pulse"></i> Activity Timeline</div>
+        <span class="panel-sub">last {{ (stats.recent || []).length }} changes</span>
+      </div>
+      <div v-if="!(stats.recent || []).length" class="empty-state"><i class="ph-pulse"></i><p>No activity recorded</p></div>
+      <div v-else class="timeline">
+        <div v-for="r in (stats.recent || [])" :key="r.id" class="tl-entry" :class="{created: r.field==='created'}">
+          <div class="tl-head">
+            <span class="finding-slug clickable" style="cursor:pointer;" @click="openDetail(r.finding_id)">{{ r.slug }}</span>
+            <span style="color: var(--text-secondary);">{{ truncate(r.title, 40) }}</span>
+            <span class="badge" :class="r.actor==='user' ? 'badge-info' : 'badge-violet'" style="margin-left:auto;">{{ r.actor }}</span>
+          </div>
+          <div class="tl-time">{{ formatTime(r.ts) }}</div>
+          <div class="tl-change">
+            <span class="chip-label">{{ r.field }}:</span>
+            <span class="old">{{ r.old_value || '∅' }}</span>
+            <span class="arrow">→</span>
+            <span class="new">{{ r.new_value || '∅' }}</span>
+          </div>
+          <div class="tl-note" v-if="r.note">“{{ r.note }}”</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-arc panel-arc-br"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-archive"></i> Historical Record</div>
+        <span class="panel-sub">source = historical · {{ historicalFindings.length }} items</span>
+      </div>
+      <div v-if="findingsLoading" class="page-loader"><div class="loading-spinner"></div> Loading...</div>
+      <div v-else-if="historicalFindings.length === 0" class="empty-state"><i class="ph-archive"></i><p>No historical findings mined from the changelog</p></div>
+      <div v-else>
+        <div v-for="f in historicalFindings" :key="f.id" class="hist-item" @click="openDetail(f.id)">
+          <span class="badge" :class="sevBadge(f.severity)">{{ f.severity }}</span>
+          <span class="hist-slug">{{ f.slug }}</span>
+          <span class="hist-title">{{ f.title }}</span>
+          <span class="hist-ref" v-if="f.changelog_ref"><i class="ph-git-commit"></i> {{ f.changelog_ref }}</span>
+          <span class="badge" :class="statusBadge(f.status)">{{ f.status }}</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== NOTIFICATIONS (Home Assistant push) ==================== -->
+  <main class="app-main" v-if="page==='notify'">
+
+    <!-- Panel A — Connection -->
+    <div class="panel">
+      <div class="panel-arc panel-arc-tl"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-plugs-connected"></i> Home Assistant Connection</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="badge" :class="(notify.token_set && notify.base_url) ? 'badge-success' : 'badge-neutral'">
+            {{ (notify.token_set && notify.base_url) ? 'CONFIGURED' : 'NOT CONFIGURED' }}
+          </span>
+          <button class="btn btn-sm" :class="notify.enabled ? 'btn-toggle-on' : 'btn-ghost'" @click="toggleNotifyEnabled()">
+            <i :class="notify.enabled ? 'ph-bell-ringing' : 'ph-bell-slash'"></i>
+            {{ notify.enabled ? 'Enabled' : 'Disabled' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-field">
+          <label class="form-label">Base URL</label>
+          <input class="tron-input" v-model.trim="notify.base_url" placeholder="http://homeassistant.local:8123" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Default notify service</label>
+          <input class="tron-input" v-model.trim="notify.default_service" placeholder="mobile_app_surface" autocomplete="off" spellcheck="false">
+        </div>
+
+        <!-- Token field — WRITE-ONLY -->
+        <div class="detail-field full">
+          <label class="form-label">Long-lived access token</label>
+          <div v-if="notify.token_set && !notify.tokenEditing" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span class="badge badge-success"><i class="ph-check-circle"></i> Token configured<template v-if="notify.token_last4"> ••••{{ notify.token_last4 }}</template></span>
+            <button class="btn btn-ghost btn-sm" @click="notify.tokenEditing = true"><i class="ph-pencil-simple"></i> Replace token</button>
+            <button class="btn btn-danger btn-sm" @click="clearNotifyToken()"><i class="ph-trash"></i> Clear token</button>
+          </div>
+          <div v-else>
+            <input class="tron-input" type="password" v-model="notify.token_input" placeholder="Paste long-lived access token" autocomplete="off" spellcheck="false">
+            <span class="panel-sub" style="display:block; margin-top:6px;">Stored server-side. Never displayed again.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" @click="saveNotifyConfig()" :disabled="notify.saving">
+          <i class="ph-floppy-disk"></i> {{ notify.saving ? 'Saving…' : 'Save connection' }}
+        </button>
+        <button class="btn btn-success" @click="sendTestNotification()" :disabled="notify.testing || !notify.base_url || !notify.token_set">
+          <i class="ph-paper-plane-tilt"></i> {{ notify.testing ? 'Sending…' : 'Send test notification' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel B — Rules -->
+    <div class="panel">
+      <div class="panel-arc panel-arc-br"></div>
+      <div class="panel-header">
+        <div class="panel-title"><i class="ph-list-dashes"></i> Notification Rules</div>
+        <button class="btn btn-primary btn-sm" @click="openRuleModal(null)"><i class="ph-plus"></i> Add rule</button>
+      </div>
+
+      <div v-if="!notify.rules.length" class="empty-state">
+        <i class="ph-bell-slash"></i>
+        <p>No notification rules yet — Add rule to route mission events to Home Assistant.</p>
+      </div>
+      <div v-else class="table-container">
+        <table class="tron-table">
+          <thead>
+            <tr>
+              <th>On</th>
+              <th>Name</th>
+              <th>Event types</th>
+              <th>Target</th>
+              <th>Android</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in notify.rules" :key="r.id" :style="{ borderLeft: '2px solid ' + (r.enabled ? 'var(--green)' : 'var(--border-glow-dim)') }">
+              <td>
+                <button class="btn btn-sm" :class="r.enabled ? 'btn-toggle-on' : 'btn-ghost'" @click="toggleRuleEnabled(r)">
+                  <i :class="r.enabled ? 'ph-bell-ringing' : 'ph-bell-slash'"></i>{{ r.enabled ? 'On' : 'Off' }}
+                </button>
+              </td>
+              <td>
+                <div style="color: var(--text-primary);">{{ r.name || '(unnamed)' }}</div>
+                <div class="chip-label">{{ r.service || 'default service' }}</div>
+              </td>
+              <td>
+                <div class="chip-row" style="margin-top:0;">
+                  <!-- v-for on a real element over a conditional list (empty when >4),
+                       plus an independent v-if for the overflow badge. Avoids the
+                       petite-vue <template v-if>+v-for+v-else fragment that loses its
+                       anchor node and crashes the whole app on the 2nd row. -->
+                  <span v-for="ev in ((r.event_types || []).length <= 4 ? (r.event_types || []) : [])" :key="ev" class="chip"><i :class="notifyEventIcon(ev)"></i>{{ notifyEventLabel(ev) }}</span>
+                  <span v-if="(r.event_types || []).length > 4" class="badge badge-info">{{ (r.event_types || []).length }} events</span>
+                </div>
+              </td>
+              <td>
+                <span v-if="r.service" class="chip">{{ r.service }}</span>
+                <span v-else class="badge badge-neutral">default</span>
+              </td>
+              <td>
+                <div class="chip-row" style="margin-top:0;">
+                  <span v-if="r.importance" class="badge" :class="r.importance==='high' || r.importance==='max' ? 'badge-warning' : 'badge-neutral'">{{ r.importance }}</span>
+                  <span v-if="r.channel" class="chip">{{ r.channel }}</span>
+                </div>
+              </td>
+              <td>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button class="btn btn-ghost btn-sm" @click="testRule(r)" title="Send test"><i class="ph-paper-plane-tilt"></i></button>
+                  <button class="btn btn-violet btn-sm" @click="openRuleModal(r)" title="Edit"><i class="ph-pencil-simple"></i></button>
+                  <button class="btn btn-danger btn-sm" @click="confirmDeleteRule(r)" title="Delete"><i class="ph-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== AI COCKPIT MODAL (modal-xl two-pane: HUD + conversation) ==================== -->
+  <div class="modal-backdrop" v-if="cockpitKey" @click.self="closeCockpit()">
+    <div class="modal-content cockpit-modal animate__animated animate__fadeInUp">
+      <div class="ck-header">
+        <button class="modal-close" @click="closeCockpit()"><i class="ph-x"></i></button>
+        <span class="mission-key">{{ cockpitKey }}</span>
+        <span class="status-pill" :class="missionView(cockpitMission,'cockpit').pillClass"><i :class="missionView(cockpitMission,'cockpit').icon"></i>{{ missionView(cockpitMission,'cockpit').label }}</span>
+        <span class="worker-chip" :class="ls(cockpitKey).worker_online ? 'online' : (ls(cockpitKey).retries>0 ? 'retrying' : '')">
+          <i :class="ls(cockpitKey).retries>0 && !ls(cockpitKey).worker_online ? 'ph-arrows-clockwise' : 'ph-broadcast'"></i>{{ ls(cockpitKey).worker_online ? 'Online' : (ls(cockpitKey).retries>0 ? ('Retry ×'+ls(cockpitKey).retries) : 'Offline') }}
+        </span>
+        <span class="counter-pill" v-if="ls(cockpitKey).model"><i class="ph-cpu"></i>{{ shortModel(ls(cockpitKey).model) }}</span>
+        <span class="counter-pill" v-if="ls(cockpitKey).permission_mode"><i class="ph-lock-key-open"></i>{{ ls(cockpitKey).permission_mode }}</span>
+      </div>
+      <div class="cockpit-body">
+        <!-- LEFT: full HUD -->
+        <div class="cockpit-hud">
+          <div class="activity-ticker" v-if="ls(cockpitKey).activity">
+            <i class="ph-broadcast at-tick"></i><span class="at-text">{{ ls(cockpitKey).activity }}</span>
+          </div>
+
+          <div class="approval-pill" v-if="ls(cockpitKey).approval_pending">
+            <i class="ph-hand-palm"></i>
+            <span>Approval needed · {{ ls(cockpitKey).approval_pending.tool_name }}</span>
+            <span class="ap-cmd" v-if="ls(cockpitKey).approval_pending.command">{{ ls(cockpitKey).approval_pending.command }}</span>
+            <button class="btn btn-success btn-sm" @click="approveGate(cockpitKey, ls(cockpitKey).approval_pending.gate_id, 'allow')"><i class="ph-check"></i> Approve</button>
+            <button class="btn btn-danger btn-sm" @click="approveGate(cockpitKey, ls(cockpitKey).approval_pending.gate_id, 'deny')"><i class="ph-x"></i> Deny</button>
+          </div>
+
+          <div class="plan-card" v-if="ls(cockpitKey).plan">
+            <div class="hud-sec-label"><i class="ph-list-checks"></i> Proposed Plan</div>
+            <div class="plan-steps">
+              <span class="plan-step-wrap" v-for="(st, i) in (ls(cockpitKey).plan.steps || [])" :key="i" style="display:inline-flex;align-items:center;">
+                <span class="plan-conn" v-if="i>0"></span>
+                <span class="plan-step"><span class="ps-n">{{ i+1 }}</span><i :class="lifecycleIcon({lifecycle: stageToLifecycle((st && st.stage) || 'implement')})"></i>{{ (st && st.label) || st }}</span>
+              </span>
+            </div>
+            <div class="plan-files" v-if="(ls(cockpitKey).plan.files || []).length">
+              <span class="fc-chip" v-for="(f, i) in ls(cockpitKey).plan.files.slice(0,10)" :key="i"><i class="ph-file"></i>{{ baseName(f) }}</span>
+            </div>
+            <div class="pc-risk" v-if="ls(cockpitKey).plan.risk"><i class="ph-warning"></i>{{ ls(cockpitKey).plan.risk }}</div>
+          </div>
+
+          <div class="hud-sec"><div class="hud-sec-label"><i class="ph-flow-arrow"></i> Lifecycle</div></div>
+          <div class="stepper-wrap">
+            <svg class="lifecycle-stepper" viewBox="0 0 600 70" preserveAspectRatio="xMinYMin meet">
+              <g>
+                <g v-for="(seg, i) in stepperSegments(ls(cockpitKey))" :key="'cseg'+i">
+                  <polyline class="ls-conn" :points="seg.points" :style="{ stroke: seg.color }"></polyline>
+                  <polyline class="ls-trace" v-if="seg.active" :points="seg.points" :style="{ stroke: seg.color }"></polyline>
+                </g>
+              </g>
+              <g v-for="(nd, i) in stepperNodes(ls(cockpitKey))" :key="'cnd'+i">
+                <rect class="ls-node-rect" :x="nd.x" :y="nd.y" width="44" height="30" rx="6"
+                      :style="{ fill: nd.fill, stroke: nd.stroke, strokeWidth: 1.4, color: nd.stroke, filter: nd.reached ? 'drop-shadow(0 0 5px '+nd.stroke+')' : 'none' }"></rect>
+                <text class="ls-node-label" :x="nd.x+22" :y="nd.y+19" text-anchor="middle" :style="{ fill: nd.stroke }">{{ nd.short }}</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="triad">
+            <span class="triad-chip" v-for="tr in [['build','ph-hammer'],['deploy','ph-upload'],['smoke','ph-device-tablet']]" :key="tr[0]" :class="'tc-'+triadState(ls(cockpitKey),tr[0])"><i class="tlead" :class="triadIcon(ls(cockpitKey),tr[0],tr[1])"></i><span class="tc-state">{{ triadState(ls(cockpitKey),tr[0]) }}</span><span class="tc-target">{{ tr[0] }} · {{ (ls(cockpitKey).triad[tr[0]]||{}).target }}</span></span>
+          </div>
+
+          <div class="hud-pill-row">
+            <span class="counter-pill" :class="(ls(cockpitKey).items.done+ls(cockpitKey).items.total)>0 ? 'has' : ''"><i class="ph-list-checks"></i>{{ ls(cockpitKey).items.done }}/{{ ls(cockpitKey).items.total }} items</span>
+            <span class="bugs-pill" :class="ls(cockpitKey).bugs_found>0 ? 'has' : ''"><i class="ph-bug"></i>{{ ls(cockpitKey).bugs_found || 0 }} bugs</span>
+            <span class="blockers-pill" :class="(ls(cockpitKey).blockers && ls(cockpitKey).blockers.length) ? 'blocked' : ''" :title="blockerReason(ls(cockpitKey))"><i :class="(ls(cockpitKey).blockers && ls(cockpitKey).blockers.length) ? 'ph-warning-octagon' : 'ph-shield-check'"></i>{{ (ls(cockpitKey).blockers && ls(cockpitKey).blockers.length) ? 'Blocked' : 'No Blockers' }}</span>
+          </div>
+
+          <!-- Device telemetry mini-panel -->
+          <div class="hud-pill-row" v-if="ls(cockpitKey).device && (ls(cockpitKey).device.process_alive!==null || ls(cockpitKey).device.last_fault)">
+            <span class="triad-chip" :class="ls(cockpitKey).device.last_fault ? 'tc-fail' : (ls(cockpitKey).device.process_alive ? 'tc-pass' : 'tc-idle')">
+              <i class="tlead" :class="ls(cockpitKey).device.last_fault ? 'ph-bug-beetle' : 'ph-device-tablet'"></i>
+              <span class="tc-state">{{ ls(cockpitKey).device.last_fault ? 'fault' : (ls(cockpitKey).device.process_alive ? 'alive' : 'device') }}</span>
+              <span class="tc-target" v-if="ls(cockpitKey).device.exception_code">{{ ls(cockpitKey).device.exception_code }}</span>
+            </span>
+            <span class="counter-pill has" v-if="ls(cockpitKey).device.dump_captured"><i class="ph-floppy-disk"></i>dump captured</span>
+          </div>
+
+          <div class="plan-files" v-if="(ls(cockpitKey).files_changed || []).length">
+            <span class="fc-chip" v-for="(f, i) in ls(cockpitKey).files_changed.slice(0,16)" :key="'cfc'+i"><i class="ph-files"></i>{{ baseName(f) }}</span>
+          </div>
+
+          <div class="glyph-ticker" v-if="(ls(cockpitKey).tools_recent || []).length">
+            <i class="ph-pulse gt-lead"></i>
+            <span class="glyph" v-for="(t, i) in ls(cockpitKey).tools_recent" :key="t.id || ('cg'+i)" :class="t.ok===false ? 'gl-err' : (t.ok===true ? 'gl-ok' : 'gl-pending')" :title="t.label"><i :class="familyIcon(t.family)"></i></span>
+          </div>
+
+          <div class="cost-gauge" v-if="ls(cockpitKey).cost_usd>0 || ls(cockpitKey).turns>0">
+            <svg width="54" height="54" viewBox="0 0 54 54">
+              <path class="cg-arc-track" d="M 27 50 A 23 23 0 1 1 27 4"></path>
+              <path class="cg-arc-cache" d="M 27 50 A 23 23 0 1 1 27 4" pathLength="100" :style="{ strokeDasharray: cacheArc(ls(cockpitKey)) }"></path>
+              <path class="cg-arc-fill" d="M 27 50 A 23 23 0 1 1 27 4" pathLength="100" :style="{ strokeDasharray: costArc(ls(cockpitKey)) }"></path>
+            </svg>
+            <div class="cg-stats">
+              <span class="cg-cost"><i class="ph-coins"></i> ${{ (ls(cockpitKey).cost_usd||0).toFixed(2) }}</span>
+              <span class="cg-sub">{{ ls(cockpitKey).turns||0 }} turns · {{ tokFmt((ls(cockpitKey).tokens||{}).input) }} in / {{ tokFmt((ls(cockpitKey).tokens||{}).output) }} out · {{ tokFmt((ls(cockpitKey).tokens||{}).cache_read) }} cache</span>
+              <span class="cg-sub" v-if="ls(cockpitKey).next_action">→ {{ ls(cockpitKey).next_action }}</span>
+            </div>
+          </div>
+
+          <div class="mission-actions">
+            <button class="btn btn-sm" :class="missionView(cockpitMission,'cockpit').primary && missionView(cockpitMission,'cockpit').primary.act==='stopMission' ? 'btn-danger' : 'btn-primary'" v-if="missionView(cockpitMission,'cockpit').primary" @click="act(missionView(cockpitMission,'cockpit').primary.act, cockpitKey)" :disabled="missionView(cockpitMission,'cockpit').primary.disabled"><i :class="missionView(cockpitMission,'cockpit').primary.icon"></i> {{ spawning[cockpitKey] ? '…' : missionView(cockpitMission,'cockpit').primary.verb }}</button>
+            <details class="action-menu" v-if="missionView(cockpitMission,'cockpit').overflow.length">
+              <summary class="btn btn-ghost btn-icon"><i class="ph-dots-three"></i></summary>
+              <div class="am-panel">
+                <button v-for="(it,i) in missionView(cockpitMission,'cockpit').overflow" :key="i" class="btn btn-ghost btn-sm" :class="it.danger?'danger':''" :disabled="it.disabled" @click="act(it.act, cockpitKey); $event.target.closest('details.action-menu').open=false"><i :class="it.icon"></i> {{ it.verb }}</button>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- RIGHT: conversation pane (secondary, collapsed-aware) -->
+        <div class="cockpit-convo">
+          <div class="cc-head">
+            <i class="ph-chat-circle-dots"></i> Conversation
+            <span class="cc-spacer"></span>
+            <button class="convo-toggle-btn" @click="convoFollow=!convoFollow" :title="convoFollow ? 'auto-scroll on' : 'auto-scroll off'"><i :class="convoFollow ? 'ph-arrow-line-down' : 'ph-pause'"></i> {{ convoFollow ? 'Follow' : 'Paused' }}</button>
+            <button class="convo-toggle-btn" @click="copyTranscript(cockpitKey)" title="copy transcript"><i class="ph-copy"></i></button>
+          </div>
+          <div class="cc-rows">
+            <div class="convo-empty" v-if="!(missionMessages[cockpitKey] || []).length">No messages yet. Spawn or steer the worker to begin.</div>
+            <div v-for="row in convoRows" :key="row.key" class="convo-row" :class="row.cls" :style="row.user ? {color:'var(--cyan)'} : null">
+              <i v-if="row.icon" :class="row.icon"></i>
+              <span v-if="row.badge" class="cr-role" :class="row.ai ? 'cr-role-ai' : ''">{{ row.badge }}</span>
+              <span v-if="row.cmd" class="crt-cmd">{{ row.cmd }}</span>{{ row.body }}
+            </div>
+          </div>
+          <div class="convo-input">
+            <textarea v-model="steerDraft" placeholder="Steer the worker… (Enter to send, Shift+Enter newline)" @keydown.enter.exact.prevent="steerMission(cockpitKey)"></textarea>
+            <button class="btn btn-primary btn-sm" @click="steerMission(cockpitKey)" :disabled="!steerDraft.trim()" title="send steering turn"><i class="ph-paper-plane-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BIG IN-PAGE ISSUE MODAL (65vw × 80vh) ==================== -->
+  <div class="modal-backdrop" v-if="detail.show" @click.self="detail.show=false">
+    <div class="modal-content modal-xl animate__animated animate__fadeInUp">
+      <div class="mx-header">
+        <button class="modal-close" @click="detail.show=false"><i class="ph-x"></i></button>
+        <div v-if="detail.finding" class="modal-title" style="margin-bottom:8px;"><i class="ph-bug"></i> {{ detail.finding.slug }}</div>
+        <div v-if="detail.finding" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <span class="badge" :class="sevBadge(detail.finding.severity)">{{ detail.finding.severity }}</span>
+          <span class="badge" :class="statusBadge(detail.finding.status)">{{ detail.finding.status }}</span>
+          <span class="agent-phase-chip" :style="{ borderColor: phaseColor(detail.finding.phase), color: phaseColor(detail.finding.phase) }"><i :class="phaseIcon(detail.finding.phase)"></i>{{ detail.finding.phase }} · {{ phaseName(detail.finding.phase) }}</span>
+          <span class="badge badge-magenta" v-if="detail.finding.feature_serves_no_purpose"><i class="ph-prohibit"></i> serves no purpose</span>
+        </div>
+        <div v-if="detail.finding" class="mx-title">{{ detail.finding.title }}</div>
+      </div>
+
+      <div class="mx-scroll">
+        <div v-if="detail.loading" class="page-loader"><div class="loading-spinner"></div> Loading…</div>
+        <div v-else-if="detail.finding" class="mx-grid">
+          <!-- MAIN COLUMN -->
+          <div>
+            <!-- status control -->
+            <div class="section-divider" style="margin-top:0;"><i class="ph-flag"></i> Status Control</div>
+            <div class="status-control-row">
+              <button class="btn btn-sm" :class="isQueued(detail.finding.slug) ? 'btn-toggle-on' : 'btn-primary'" @click="queueRowAction(detail.finding)"><i :class="isQueued(detail.finding.slug) ? 'ph-check' : (detail.finding.workflow==='VALID' ? 'ph-rocket-launch' : 'ph-stack-plus')"></i> {{ isQueued(detail.finding.slug) ? 'Queued for sprint' : (detail.finding.workflow==='VALID' ? 'Queue to run' : 'Add to Sprint Queue') }}</button>
+              <button v-for="(it,i) in findingStatusActions(detail.finding)" :key="i" class="btn btn-sm" :class="it.tone" @click="runDetailAction(it)"><i :class="it.icon"></i> {{ it.verb }}</button>
+            </div>
+
+            <!-- description -->
+            <div class="section-divider"><i class="ph-text-align-left"></i> Description</div>
+            <div class="finding-section" v-if="detail.finding.evidence"><div class="sec-label">Evidence</div><div class="sec-text">{{ detail.finding.evidence }}</div></div>
+            <div class="finding-section" v-if="detail.finding.perf_mechanism"><div class="sec-label">Perf Mechanism</div><div class="sec-text">{{ detail.finding.perf_mechanism }}</div></div>
+            <div class="finding-section" v-if="detail.finding.device_impact"><div class="sec-label">Device Impact</div><div class="sec-text">{{ detail.finding.device_impact }}</div></div>
+            <div class="finding-section" v-if="detail.finding.recommendation"><div class="sec-label">Recommendation</div><div class="sec-text">{{ detail.finding.recommendation }}</div></div>
+            <div class="finding-section" v-if="!detail.finding.evidence && !detail.finding.perf_mechanism && !detail.finding.device_impact && !detail.finding.recommendation"><div class="sec-text" style="color:var(--text-dim);">No detailed description recorded.</div></div>
+
+            <!-- resolution logging -->
+            <div class="section-divider"><i class="ph-seal-check"></i> Resolution Log</div>
+            <div class="resolution-block" v-if="detail.finding.resolution"><div class="sec-label">Recorded Resolution</div><div class="sec-text">{{ detail.finding.resolution }}</div></div>
+            <div class="resolve-log-hint" v-else style="color: var(--text-dim); font-size: 0.9rem;">Use Resolve / Verify / Won't fix above — each opens a note dialog that records the resolution.</div>
+
+            <!-- comments -->
+            <div class="section-divider"><i class="ph-chats"></i> Comments ({{ detail.comments.length }})</div>
+            <div v-if="detail.comments.length === 0" style="color: var(--text-dim); font-size: 1rem; margin-bottom: 10px;">No comments yet.</div>
+            <div v-else style="margin-bottom: 12px;">
+              <div v-for="(c, i) in detail.comments" :key="i" class="comment">
+                <div class="comment-head"><span class="comment-author">{{ c.author }}</span><span class="comment-time">{{ formatTime(c.ts) }}</span></div>
+                <div class="comment-body">{{ c.body }}</div>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <textarea class="tron-textarea" placeholder="Add a comment / note…" v-model="detail.newComment"></textarea>
+              <div class="btn-row">
+                <button class="btn btn-primary btn-sm" @click="addComment()" :disabled="!detail.newComment.trim() || detail.posting">
+                  <i class="ph-paper-plane-tilt"></i> {{ detail.posting ? 'Posting…' : 'Add Comment' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- META RAIL -->
+          <div class="mx-rail">
+            <div class="mx-rail-card">
+              <div class="mini-label"><i class="ph-info"></i> Metadata</div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Phase</span><span class="df-value" :style="{ color: phaseColor(detail.finding.phase) }">{{ detail.finding.phase }} · {{ phaseName(detail.finding.phase) }}</span></div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Subsystem</span><span class="df-value">{{ detail.finding.subsystem || '—' }}</span></div>
+              <div class="detail-field" style="margin-bottom:8px;" v-if="detail.finding.subsystem_detail && detail.finding.subsystem_detail !== detail.finding.subsystem"><span class="df-label">Subsystem detail</span><span class="df-value">{{ detail.finding.subsystem_detail }}</span></div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Workflow</span><span class="df-value">{{ detail.finding.workflow || '—' }}</span></div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Category</span><span class="df-value">{{ detail.finding.category || '—' }}</span></div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Location</span><span class="df-value tag-hex" style="font-size:.86rem;">{{ detail.finding.location || '—' }}</span></div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Effort · Risk · Confidence</span><span class="df-value">{{ detail.finding.effort || '—' }} · {{ detail.finding.risk || '—' }} · {{ detail.finding.confidence || '—' }}</span></div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Source</span><span class="df-value">{{ detail.finding.source || '—' }}</span></div>
+              <div class="detail-field" v-if="detail.finding.changelog_ref"><span class="df-label">Changelog ref</span><span class="df-value">{{ detail.finding.changelog_ref }}</span></div>
+            </div>
+            <div class="mx-rail-card">
+              <div class="mini-label"><i class="ph-clock"></i> Timestamps</div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Created</span><span class="df-value">{{ formatTime(detail.finding.created_at) }}</span></div>
+              <div class="detail-field" style="margin-bottom:8px;"><span class="df-label">Updated</span><span class="df-value">{{ formatTime(detail.finding.updated_at) }}</span></div>
+              <div class="detail-field"><span class="df-label">Resolved</span><span class="df-value">{{ detail.finding.resolved_at ? formatTime(detail.finding.resolved_at) : '—' }}</span></div>
+            </div>
+            <div class="mx-rail-card">
+              <div class="mini-label"><i class="ph-clock-counter-clockwise"></i> History ({{ detail.history.length }})</div>
+              <div v-if="detail.history.length === 0" style="color: var(--text-dim); font-size: 0.95rem;">No history.</div>
+              <div v-else class="timeline" style="max-height:320px;overflow-y:auto;">
+                <div v-for="h in detail.history" :key="h.id || (h.ts + h.field)" class="tl-entry" :class="{created: h.field==='created'}">
+                  <div class="tl-head">
+                    <span class="tl-time">{{ formatTime(h.ts) }}</span>
+                    <span class="badge" :class="h.actor==='user' ? 'badge-info' : 'badge-violet'" style="margin-left:auto;">{{ h.actor }}</span>
+                  </div>
+                  <div class="tl-change">
+                    <span class="chip-label">{{ h.field }}:</span>
+                    <span class="old">{{ truncate(h.old_value, 26) || '∅' }}</span><span class="arrow">→</span><span class="new">{{ truncate(h.new_value, 26) || '∅' }}</span>
+                  </div>
+                  <div class="tl-note" v-if="h.note">“{{ h.note }}”</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== RESOLVE MODAL ==================== -->
+  <div class="modal-backdrop" v-if="resolveModal.show" @click.self="resolveModal.show=false">
+    <div class="modal-content modal-sm animate__animated animate__fadeInUp">
+      <button class="modal-close" @click="resolveModal.show=false"><i class="ph-x"></i></button>
+      <div class="modal-title">
+        <i :class="resolveModal.status==='wont_fix' ? 'ph-prohibit' : (resolveModal.status==='verified' ? 'ph-seal-check' : 'ph-check-circle')"></i>
+        {{ resolveModal.status==='wont_fix' ? "Won't Fix" : (resolveModal.status==='verified' ? 'Verify Finding' : 'Resolve Finding') }}
+      </div>
+      <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 12px;">
+        <span class="finding-slug">{{ resolveModal.slug }}</span> — {{ resolveModal.title }}
+      </p>
+      <div class="form-group">
+        <label class="form-label">Resolution / Note</label>
+        <textarea class="tron-textarea" v-model="resolveModal.resolution" placeholder="Describe how this was resolved..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" @click="resolveModal.show=false">Cancel</button>
+        <button class="btn" :class="resolveModal.status==='wont_fix' ? 'btn-warning' : 'btn-success'" @click="submitResolve()" :disabled="resolveModal.loading">
+          <i class="ph-check"></i> {{ resolveModal.loading ? 'Saving...' : 'Confirm' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== REOPEN A COMPLETED MISSION (with reason -> AI) ===== -->
+  <div class="modal-backdrop" v-if="reopenModal.show" @click.self="reopenModal.show=false">
+    <div class="modal-content modal-sm animate__animated animate__fadeInUp">
+      <button class="modal-close" @click="reopenModal.show=false"><i class="ph-x"></i></button>
+      <div class="modal-title"><i class="ph-lock-key-open"></i> Reopen Mission {{ reopenModal.key }}</div>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">
+        This mission is complete. Reopening moves it back to <b>review</b> and re-enables
+        Plan / Spawn / Resume. Your reason is handed to the worker on the next relaunch.
+      </p>
+      <div class="form-group">
+        <label class="form-label">Reopen reason (required)</label>
+        <textarea class="tron-textarea" v-model="reopenModal.reason" placeholder="Why is this being reopened? e.g. 'A follow-up review found the NEON path still regresses on device — re-verify item WF1-052 and fix.'"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" @click="reopenModal.show=false">Cancel</button>
+        <button class="btn btn-warning" @click="submitReopen()" :disabled="!reopenModal.reason.trim() || reopenModal.loading">
+          <i class="ph-lock-key-open"></i> {{ reopenModal.loading ? 'Reopening…' : 'Reopen' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CLAUDE CLI SIGN-IN (OAuth paste-code flow) ===== -->
+  <div class="modal-backdrop" v-if="loginModal.show" @click.self="cancelLogin()">
+    <div class="modal-content modal-sm animate__animated animate__fadeInUp">
+      <button class="modal-close" @click="cancelLogin()"><i class="ph-x"></i></button>
+      <div class="modal-title"><i class="ph-sign-in"></i> Sign in to the Claude CLI</div>
+
+      <div v-if="loginModal.phase === 'idle' || loginModal.phase === 'starting'">
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">
+          The Claude CLI is signed out, so missions can't run. Sign in with your Anthropic account —
+          <b>Continue with Google</b> is available on the sign-in page.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Email (optional — pre-fills the sign-in page)</label>
+          <input class="tron-input" v-model="loginModal.email" placeholder="you@example.com">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" @click="cancelLogin()">Cancel</button>
+          <button class="btn btn-primary" @click="beginLogin()" :disabled="loginModal.phase === 'starting'">
+            <i class="ph-sign-in"></i> {{ loginModal.phase === 'starting' ? 'Starting…' : 'Sign in' }}
+          </button>
+        </div>
+      </div>
+
+      <div v-if="loginModal.phase === 'waiting' || loginModal.phase === 'submitting'">
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">
+          Click below to open the sign-in page, approve it in your browser
+          (<b>Continue with Google</b> works), and this window will finish on its own — <b>no code needed</b>.
+        </p>
+        <a class="btn btn-primary" :href="loginModal.url" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+          <i class="ph-arrow-square-out"></i> Open sign-in page
+        </a>
+        <p style="font-size: 0.82rem; margin-top: 12px; color: var(--cyan);">
+          <i class="ph-spinner-gap"></i> Waiting for you to approve the sign-in…
+        </p>
+        <details style="margin-top: 12px;">
+          <summary style="cursor:pointer; font-size:0.8rem; color:var(--text-dim);">Nothing happened after approving? Paste a code instead</summary>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <input class="tron-input" v-model="loginModal.code" placeholder="paste sign-in code" @keydown.enter="submitLoginCode()" style="flex:1;">
+            <button class="btn btn-success btn-sm" @click="submitLoginCode()" :disabled="!loginModal.code.trim() || loginModal.phase === 'submitting'">
+              <i class="ph-check"></i> {{ loginModal.phase === 'submitting' ? 'Verifying…' : 'Use code' }}
+            </button>
+          </div>
+        </details>
+        <div class="btn-row" style="margin-top:14px;">
+          <button class="btn btn-ghost" @click="cancelLogin()">Cancel</button>
+        </div>
+      </div>
+
+      <div v-if="loginModal.error" style="color: var(--red); font-size: 0.82rem; margin-top: 10px;">{{ loginModal.error }}</div>
+    </div>
+  </div>
+
+  <!-- ===== RUNTIME DEBUG (observability #1: /api/debug/runtime) ===== -->
+  <div class="modal-backdrop" v-if="debug.show" @click.self="debug.show=false">
+    <div class="modal-content modal-xl animate__animated animate__fadeInUp">
+      <button class="modal-close" @click="debug.show=false"><i class="ph-x"></i></button>
+      <div class="modal-title"><i class="ph-pulse"></i> Runtime Debug</div>
+      <div class="btn-row" style="margin: 4px 0 12px;">
+        <span style="color: var(--text-secondary); font-size: 0.85rem;">
+          {{ debug.data ? (debug.data.running_count || 0) : 0 }} live worker(s) ·
+          {{ debug.data && debug.data.log_tail ? debug.data.log_tail.length : 0 }} log line(s)
+        </span>
+        <button class="btn btn-ghost btn-sm" @click="openDebug()" :disabled="debug.loading" style="margin-left:auto;">
+          <i class="ph-arrow-clockwise" :class="{'animate__animated animate__rotateIn': debug.loading}"></i>
+          {{ debug.loading ? 'Loading…' : 'Reload' }}
+        </button>
+      </div>
+      <div v-if="debug.data && debug.data.error" class="finding-slug" style="color: var(--red); margin-bottom: 10px;">
+        snapshot error: {{ debug.data.error }}
+      </div>
+
+      <div class="form-label" style="margin-top:4px;">Running workers</div>
+      <div v-if="!debug.data || !Object.keys(debug.data.running || {}).length"
+           style="color: var(--text-dim); font-size: 0.85rem; margin: 4px 0 12px;">
+        No workers currently running.
+      </div>
+      <div v-for="(h, key) in (debug.data ? debug.data.running : {})" :key="key"
+           style="border:1px solid rgba(138,69,255,0.18); border-radius:8px; padding:8px 10px; margin-bottom:8px;">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span class="finding-slug">{{ key }}</span>
+          <span v-if="h.state" class="chip badge-info">{{ h.state }}</span>
+          <span v-else class="chip" :style="{color: h.alive ? 'var(--green)' : 'var(--orange)', borderColor: h.alive ? 'rgba(0,255,136,0.4)' : 'rgba(255,136,0,0.4)'}">
+            {{ h.alive ? 'alive' : 'exited' }}
+          </span>
+          <span v-if="h.pid" style="color:var(--text-dim); font-size:0.78rem;">pid {{ h.pid }}</span>
+          <span v-if="h.phase" style="color:var(--text-dim); font-size:0.78rem;">phase {{ h.phase }}</span>
+          <span v-if="h.open_tools" style="color:var(--text-dim); font-size:0.78rem;">{{ h.open_tools }} open tool(s)</span>
+          <span v-if="h.closed" class="chip" style="color:var(--orange); border-color:rgba(255,136,0,0.4);">stdin closed</span>
+        </div>
+        <div v-if="h.session_id" style="color:var(--text-dim); font-size:0.72rem; margin-top:3px;">session {{ h.session_id }}</div>
+        <pre v-if="h.stderr_tail && h.stderr_tail.length"
+             style="max-height:120px; overflow:auto; background:rgba(0,0,0,0.35); padding:6px 8px; border-radius:6px; font-size:0.72rem; margin-top:6px; white-space:pre-wrap;">{{ h.stderr_tail.join('\n') }}</pre>
+        <div v-if="h.error" style="color:var(--red); font-size:0.78rem;">{{ h.error }}</div>
+      </div>
+
+      <div class="form-label" style="margin-top:10px;">runtime.log (tail)</div>
+      <pre style="max-height:260px; overflow:auto; background:rgba(0,0,0,0.4); padding:8px 10px; border-radius:6px; font-size:0.72rem; white-space:pre-wrap;">{{ debug.data && debug.data.log_tail && debug.data.log_tail.length ? debug.data.log_tail.join('\n') : 'no log lines' }}</pre>
+    </div>
+  </div>
+
+  <!-- ===== NOTIFICATION RULE EDITOR ===== -->
+  <div class="modal-backdrop" v-if="ruleModal.show">
+    <div class="modal-content animate__animated animate__fadeInUp">
+      <button class="modal-close" @click="ruleModal.show=false"><i class="ph-x"></i></button>
+      <div class="modal-title"><i class="ph-bell-ringing"></i> {{ ruleModal.id ? 'Edit Rule' : 'New Rule' }}</div>
+
+      <!-- Routing -->
+      <div class="section-divider"><i class="ph-flow-arrow"></i> Routing</div>
+      <div class="detail-grid">
+        <div class="detail-field">
+          <label class="form-label">Rule name</label>
+          <input class="tron-input" v-model.trim="ruleModal.name" placeholder="e.g. Stalls" autocomplete="off">
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Enabled</label>
+          <button class="btn btn-sm" :class="ruleModal.enabled ? 'btn-toggle-on' : 'btn-ghost'" @click="ruleModal.enabled = !ruleModal.enabled" style="align-self:flex-start;">
+            <i :class="ruleModal.enabled ? 'ph-check' : 'ph-prohibit'"></i>{{ ruleModal.enabled ? 'Enabled' : 'Disabled' }}
+          </button>
+        </div>
+        <div class="detail-field full">
+          <label class="form-label">Target notify service <span style="color:var(--text-dim);">(blank = default)</span></label>
+          <input class="tron-input" v-model.trim="ruleModal.service" :placeholder="notify.default_service || 'mobile_app_surface'" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Event types -->
+      <div class="section-divider"><i class="ph-lightning"></i> Event types</div>
+      <div class="btn-row" style="justify-content:flex-start; margin-top:0;">
+        <button class="btn btn-ghost btn-sm" @click="ruleModal.events = notifyEventCatalog.map(e => e.value)"><i class="ph-check-square"></i> Select all</button>
+        <button class="btn btn-ghost btn-sm" @click="ruleModal.events = []"><i class="ph-x-square"></i> Clear</button>
+      </div>
+      <div class="chip-row">
+        <span v-for="ev in notifyEventCatalog" :key="ev.value" class="chip"
+              :class="ruleModal.events.includes(ev.value) ? 'badge-info' : ''" style="cursor:pointer;"
+              @click="toggleRuleEvent(ev.value)">
+          <i :class="ev.icon"></i>{{ ev.label }}
+        </span>
+      </div>
+
+      <!-- Message -->
+      <div class="section-divider"><i class="ph-chat-text"></i> Message</div>
+      <div class="form-group">
+        <label class="form-label">Title template</label>
+        <input class="tron-input" v-model="ruleModal.title_template" placeholder="e.g. Stall: {mission_key}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message template</label>
+        <textarea class="tron-textarea" v-model="ruleModal.message_template" placeholder="e.g. {reason} (status {status})"></textarea>
+      </div>
+      <div class="chip-row" style="margin-top:6px;">
+        <span class="chip-label" style="align-self:center;">Always:</span>
+        <span v-for="ph in notifyPlaceholders" :key="ph" class="chip" style="cursor:pointer;" @click="insertPlaceholder(ph)"><i class="ph-brackets-curly"></i>{{ ph }}</span>
+      </div>
+      <div class="chip-row" style="margin-top:6px;">
+        <span class="chip-label" style="align-self:center;" title="Populated only for events that supply them">Event-specific:</span>
+        <span v-for="ph in notifyPlaceholdersEvent" :key="ph" class="chip" style="cursor:pointer;" @click="insertPlaceholder(ph)"><i class="ph-brackets-curly"></i>{{ ph }}</span>
+      </div>
+
+      <!-- Android options -->
+      <div class="section-divider"><i class="ph-android-logo"></i> Android options</div>
+      <div class="detail-grid">
+        <div class="detail-field">
+          <label class="form-label">Channel</label>
+          <input class="tron-input" v-model.trim="ruleModal.channel" placeholder="Mission Alerts" autocomplete="off">
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Importance</label>
+          <select class="tron-select" v-model="ruleModal.importance">
+            <option value="min">min</option>
+            <option value="low">low</option>
+            <option value="default">default</option>
+            <option value="high">high</option>
+            <option value="max">max</option>
+          </select>
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Priority</label>
+          <select class="tron-select" v-model="ruleModal.priority">
+            <option value="normal">normal</option>
+            <option value="high">high</option>
+          </select>
+        </div>
+        <div class="detail-field">
+          <label class="form-label">TTL (sec)</label>
+          <input class="tron-input" v-model="ruleModal.ttl" inputmode="numeric" placeholder="0" autocomplete="off">
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Persistent</label>
+          <button class="btn btn-sm" :class="ruleModal.persistent ? 'btn-toggle-on' : 'btn-ghost'" @click="ruleModal.persistent = !ruleModal.persistent" style="align-self:flex-start;">
+            <i :class="ruleModal.persistent ? 'ph-check' : 'ph-prohibit'"></i>{{ ruleModal.persistent ? 'On' : 'Off' }}
+          </button>
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Sticky</label>
+          <button class="btn btn-sm" :class="ruleModal.sticky ? 'btn-toggle-on' : 'btn-ghost'" @click="ruleModal.sticky = !ruleModal.sticky" style="align-self:flex-start;">
+            <i :class="ruleModal.sticky ? 'ph-check' : 'ph-prohibit'"></i>{{ ruleModal.sticky ? 'On' : 'Off' }}
+          </button>
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Tag</label>
+          <input class="tron-input" v-model.trim="ruleModal.tag" placeholder="cockpit" autocomplete="off">
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Color</label>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input class="tron-input" v-model.trim="ruleModal.color" placeholder="#FF1744" autocomplete="off" style="flex:1;">
+            <span v-if="ruleModal.color" style="width:24px; height:24px; border-radius:5px; border:1px solid var(--border-glow-dim);" :style="{ background: ruleModal.color }"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="section-divider"><i class="ph-cursor-click"></i> Action buttons <span style="color:var(--text-dim);">(max 3)</span></div>
+      <div v-if="!ruleModal.actions.length" class="panel-sub" style="margin-bottom:10px;">No action buttons.</div>
+      <div v-for="(act, i) in ruleModal.actions" :key="i" class="detail-grid" style="margin-bottom:8px; align-items:end;">
+        <div class="detail-field">
+          <label class="form-label">Title</label>
+          <input class="tron-input" v-model.trim="act.title" placeholder="HUD" autocomplete="off">
+        </div>
+        <div class="detail-field">
+          <label class="form-label">Action id</label>
+          <input class="tron-input" v-model.trim="act.action" placeholder="URI" autocomplete="off">
+        </div>
+        <div class="detail-field">
+          <label class="form-label">URI</label>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input class="tron-input" v-model.trim="act.uri" placeholder="http://127.0.0.1:8765/" autocomplete="off" style="flex:1;">
+            <button class="btn btn-danger btn-sm" @click="removeRuleAction(i)" title="Remove"><i class="ph-minus"></i></button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" @click="addRuleAction()" :disabled="ruleModal.actions.length >= 3"><i class="ph-plus"></i> Add action</button>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" @click="ruleModal.show=false">Cancel</button>
+        <button class="btn btn-success" @click="testRuleDraft()" :disabled="!notify.base_url || !notify.token_set">
+          <i class="ph-paper-plane-tilt"></i> Send test
+        </button>
+        <button class="btn btn-primary" @click="saveRule()" :disabled="ruleModal.saving || !ruleModal.name">
+          <i class="ph-floppy-disk"></i> {{ ruleModal.saving ? 'Saving…' : 'Save rule' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PRE-FLIGHT CHECK (before dispatch) ===== -->
+  <div class="modal-backdrop" v-if="preflightOpen" @click.self="cancelPreflight()">
+    <div class="modal-content modal-xl animate__animated animate__fadeInUp">
+      <button class="modal-close" @click="cancelPreflight()"><i class="ph-x"></i></button>
+      <div class="mx-header">
+        <div class="modal-title"><i class="ph-airplane-takeoff"></i> Mission Pre-flight</div>
+      </div>
+      <div class="mx-scroll">
+      <div v-if="!preflight" class="empty-state"><i class="ph-spinner-gap"></i><p>Running pre-flight overlap check…</p></div>
+      <div v-else>
+        <p style="color: var(--text-secondary); font-size: 0.98rem; margin-bottom: 14px;">
+          Reviewing the <b>{{ preflight.queue_size }}</b> queued item(s).
+          <b style="color:var(--green);">{{ preflight.included.length }}</b> will run in this mission;
+          <b :style="{color: preflight.conflicts.length ? 'var(--orange)' : 'var(--text-dim)'}">{{ preflight.conflicts.length }}</b>
+          overlap an active mission and will be removed.
+        </p>
+
+        <!-- conflicts removed -->
+        <div v-if="preflight.conflicts.length" style="margin-bottom:16px;">
+          <div class="mini-label" style="color:var(--orange);"><i class="ph-warning"></i> Will be removed (overlap an active mission)</div>
+          <div class="issue-list">
+            <div v-for="c in preflight.conflicts" :key="c.slug" class="issue-row" style="border-left:2px solid var(--orange);">
+              <div class="issue-head" style="cursor:default;">
+                <span class="issue-slug">{{ c.slug }}</span>
+                <span class="issue-title">{{ c.title }}</span>
+                <span class="chip" style="border-color:rgba(255,149,0,0.4);color:var(--orange);"><i class="ph-arrows-merge"></i>{{ c.reason }}</span>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:0.86rem;color:var(--text-dim);margin-top:6px;">These return to the backlog (never deleted) — re-queue them once mission {{ preflight.conflicts[0].mission }} completes.</p>
+        </div>
+
+        <!-- within-queue file couplings (informational) -->
+        <div v-if="preflight.within.length" style="margin-bottom:16px;">
+          <div class="mini-label" style="color:var(--cyan);"><i class="ph-link"></i> Same-file couplings (kept — one worker handles them in order)</div>
+          <div v-for="w in preflight.within" :key="w.file" style="font-size:0.9rem;color:var(--text-secondary);padding:3px 0;">
+            <span class="finding-slug" style="font-family:var(--font-mono);">{{ w.file }}</span>
+            <span style="color:var(--text-dim);"> ← </span>{{ w.slugs.join(', ') }}
+          </div>
+        </div>
+
+        <!-- included -->
+        <div class="mini-label" style="color:var(--green);"><i class="ph-check-circle"></i> Mission items ({{ preflight.included.length }})</div>
+        <div v-if="!preflight.included.length" class="empty-state"><p>Every queued item overlaps an active mission — nothing left to dispatch.</p></div>
+        <div v-else class="issue-list">
+          <div v-for="it in preflight.included" :key="it.slug" class="issue-row" style="cursor:default;">
+            <div class="istripe" :style="{ background: sevColor(it.severity) }"></div>
+            <div class="issue-head" style="cursor:default;">
+              <span class="issue-sev-dot" :style="{ background: sevColor(it.severity) }"></span>
+              <span class="issue-slug">{{ it.slug }}</span>
+              <span class="issue-title">{{ it.title }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      </div><!-- /mx-scroll -->
+      <div class="mx-footer">
+        <label class="form-label" style="margin:0;">Reasoning</label>
+        <select class="tron-select" v-model="dispatchReasoningOverride" style="width:auto; min-width:150px;" title="Override the reasoning level for this mission (default: derived from the worst item's effort)">
+          <option value="">Auto — {{ dispatchReasoning }} (from effort)</option>
+          <option v-for="r in reasoningLevels" :key="r" :value="r">{{ r === 'Ultracode' ? 'Ultracode (multi-agent)' : r }}</option>
+        </select>
+        <span v-if="showTierSplit" style="display:inline-flex; align-items:center; gap:8px;" title="Ultracode runs a crew of sub-agents: bulk = the legwork tier, verify = the checking/red-team tier">
+          <label class="form-label" style="margin:0;">Bulk</label>
+          <select class="tron-select" v-model="dispatchBulkEffort" style="width:auto;">
+            <option v-for="e in effortTiers" :key="e" :value="e">{{ e }}</option>
+          </select>
+          <label class="form-label" style="margin:0;">Verify</label>
+          <select class="tron-select" v-model="dispatchVerifyEffort" style="width:auto;">
+            <option v-for="e in effortTiers" :key="e" :value="e">{{ e }}</option>
+          </select>
+        </span>
+        <div style="flex:1;"></div>
+        <button class="btn btn-ghost" @click="cancelPreflight()">Cancel</button>
+        <button class="btn btn-primary" @click="confirmDispatch()" :disabled="dispatching || !preflight || !preflight.included.length">
+          <i class="ph-rocket-launch"></i> {{ dispatching ? 'Dispatching…' : ('Confirm — ' + ((preflight && preflight.included.length) || 0) + ' item(s)') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script defer src="./data.js"></script>
+<script defer src="./charts.js"></script>
+<script defer src="./app.js"></script>
+<script defer src="https://unpkg.com/petite-vue@0.4.1/dist/petite-vue.iife.js"></script>
+<script>
+  // petite-vue's iife build does not auto-mount without an `init` attr; mount explicitly.
+  // All the scripts above are `defer`, so they have executed by the time DOMContentLoaded fires.
+  window.addEventListener('DOMContentLoaded', function () {
+    try { PetiteVue.createApp().mount('#app'); }
+    catch (e) { console.error('[neon] petite-vue mount failed', e); }
+  });
+</script>
+</body>
+</html>

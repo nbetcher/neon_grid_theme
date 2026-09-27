@@ -1,0 +1,448 @@
+/* 60-controls.css — buttons, form primitives, menus, tabs, switches, sliders. */
+@layer neon.controls {
+  /* ── BUTTONS ─────────────────────────────────────────────────────────────
+     Variant = a separate class, not modifier syntax. That is the system's
+     convention and it is preserved verbatim. ------------------------------ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: 0.97rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+    text-decoration: none;
+    white-space: nowrap;
+    text-shadow: var(--glyph-glow);
+  }
+  .btn:hover {
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, rgba(0, 224, 255, 0.22), rgba(138, 69, 255, 0.18));
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, rgba(0, 224, 255, 0.32), rgba(138, 69, 255, 0.26));
+    box-shadow: var(--glow-cyan-strong);
+  }
+
+  .btn-success {
+    background: rgba(0, 255, 149, 0.1);
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .btn-success:hover {
+    box-shadow: var(--glow-green);
+  }
+
+  .btn-violet {
+    background: rgba(138, 69, 255, 0.12);
+    border-color: var(--violet);
+    color: var(--violet-text);
+  }
+  .btn-violet:hover {
+    box-shadow: var(--glow-violet);
+  }
+
+  .btn-warning {
+    background: rgba(255, 149, 0, 0.1);
+    border-color: rgba(255, 149, 0, 0.5);
+    color: var(--orange);
+  }
+  .btn-warning:hover {
+    box-shadow: var(--glow-orange);
+  }
+
+  .btn-danger {
+    background: rgba(255, 59, 92, 0.08);
+    border-color: rgba(255, 59, 92, 0.4);
+    color: var(--red);
+  }
+  .btn-danger:hover {
+    background: rgba(255, 59, 92, 0.15);
+    box-shadow: var(--glow-red);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border-color: var(--border-glow-dim);
+    color: var(--text-secondary);
+  }
+  .btn-ghost:hover {
+    border-color: var(--cyan-dim);
+    color: var(--cyan);
+  }
+
+  .btn-sm {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+  }
+  .btn-lg {
+    padding: 11px 24px;
+    font-size: 1.04rem;
+  }
+  .btn-icon {
+    padding: 7px 9px;
+    line-height: 1;
+  }
+  .btn-icon .ng-icon {
+    font-size: 1.05rem;
+  }
+  .btn-block {
+    width: 100%;
+  }
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  /* Toggle-on state for filter/sort buttons in a toolbar. */
+  .btn-toggle-on {
+    background: linear-gradient(135deg, rgba(255, 149, 0, 0.18), rgba(255, 45, 170, 0.12));
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: var(--glow-orange);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ── FORM PRIMITIVES ────────────────────────────────────────────────────
+     `tron-*` is the only prefixed family in the system. Kept. --------------*/
+  .tron-input,
+  .tron-select,
+  .tron-textarea {
+    background: var(--bg-input);
+    border: var(--border-width) solid var(--border-base);
+    border-radius: var(--radius-xs);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 1.04rem;
+    padding: 8px 12px;
+    transition: var(--transition);
+    width: 100%;
+  }
+  /* The glow is decoration ON TOP of the real :focus-visible outline from
+     20-base.css — never the only focus signal. */
+  .tron-input:focus,
+  .tron-select:focus,
+  .tron-textarea:focus {
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+  }
+  .tron-input::placeholder,
+  .tron-textarea::placeholder {
+    color: var(--text-dim);
+  }
+  .tron-input:disabled,
+  .tron-select:disabled,
+  .tron-textarea:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .tron-input[aria-invalid='true'],
+  .tron-textarea[aria-invalid='true'] {
+    border-color: var(--red);
+    box-shadow: var(--glow-red);
+  }
+  .tron-select {
+    cursor: pointer;
+    text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+  }
+  .tron-select option {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+  }
+  .tron-textarea {
+    resize: vertical;
+    min-height: 70px;
+    line-height: 1.5;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.76rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-label);
+    margin-bottom: 6px;
+  }
+  .form-hint {
+    font-size: 0.8rem;
+    color: var(--text-label);
+    margin-top: 4px;
+  }
+  .form-error {
+    font-size: 0.8rem;
+    color: var(--red-text);
+    margin-top: 4px;
+  }
+
+  .filters-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .filters-row .tron-input,
+  .filters-row .tron-select {
+    width: auto;
+    min-width: 150px;
+    flex: 0 1 auto;
+  }
+  .filters-row .grow {
+    flex: 1;
+  }
+
+  .toolbar-panel {
+    padding: 16px 18px;
+  }
+  .toolbar-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .toolbar-row + .toolbar-row {
+    margin-top: 14px;
+  }
+  .toolbar-divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--border-base);
+    margin: 0 2px;
+  }
+  .toolbar-row .tron-input,
+  .toolbar-row .tron-select {
+    width: auto;
+    min-width: 140px;
+    flex: 0 1 auto;
+  }
+  .toolbar-row .grow {
+    flex: 1 1 220px;
+    min-width: 200px;
+  }
+  .tb-label {
+    font-family: var(--font-display);
+    font-size: 0.66rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-label);
+    white-space: nowrap;
+  }
+
+  /* ── ACTION MENU (Reka DropdownMenu) ────────────────────────────────────
+     The source used a raw <details>/<summary>, which is not a menu: no
+     role="menu", no arrow-key nav, no Esc, no focus return. Reka supplies all
+     four; these rules only paint it. -------------------------------------- */
+  .am-panel {
+    z-index: 640;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 180px;
+    padding: 6px;
+    background: var(--bg-panel);
+    border: var(--border-width) solid var(--border-glow-dim);
+    border-radius: var(--radius-xs);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), var(--glow-cyan);
+  }
+  .am-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+  }
+  .am-item[data-highlighted] {
+    background: rgba(0, 224, 255, 0.1);
+    color: var(--cyan);
+  }
+  .am-item[data-disabled] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .am-item.danger {
+    color: var(--red-text);
+  }
+  .am-item.danger[data-highlighted] {
+    background: rgba(255, 59, 92, 0.12);
+  }
+  .am-sep {
+    height: 1px;
+    background: var(--border-base);
+    margin: 4px 2px;
+  }
+  .am-label {
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--text-label);
+    padding: 4px 10px 2px;
+  }
+
+  /* ── TABS (Reka Tabs) ───────────────────────────────────────────────────*/
+  .ng-tabs-list {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    border-bottom: 1px solid rgba(0, 224, 255, 0.16);
+    margin-bottom: 14px;
+    overflow-x: auto;
+  }
+  .ng-tab {
+    position: relative;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-size: 0.74rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ng-tab:hover {
+    color: var(--cyan);
+    background: rgba(0, 224, 255, 0.05);
+  }
+  .ng-tab[data-state='active'] {
+    color: var(--cyan);
+    border-bottom-color: var(--cyan);
+    text-shadow: var(--glyph-glow);
+    box-shadow: 0 2px 12px -4px var(--cyan);
+  }
+  .ng-tab[data-disabled] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* ── TOOLTIP (Reka Tooltip) ─────────────────────────────────────────────*/
+  .ng-tooltip {
+    z-index: 700;
+    max-width: 320px;
+    padding: 6px 10px;
+    border-radius: var(--radius-xs);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-glow-dim);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55), var(--glow-cyan);
+  }
+  .ng-tooltip-arrow {
+    fill: var(--bg-panel);
+    stroke: var(--border-glow-dim);
+  }
+
+  /* ── SWITCH (Reka Switch) ───────────────────────────────────────────────*/
+  .ng-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 42px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    border: 1px solid var(--border-base);
+    background: var(--bg-input);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .ng-switch[data-state='checked'] {
+    border-color: var(--cyan);
+    background: rgba(0, 224, 255, 0.16);
+    box-shadow: var(--glow-cyan);
+  }
+  .ng-switch[data-disabled] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .ng-switch-thumb {
+    display: block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transform: translateX(2px);
+    transition: transform var(--transition), background var(--transition);
+    will-change: transform;
+  }
+  .ng-switch[data-state='checked'] .ng-switch-thumb {
+    background: var(--cyan);
+    transform: translateX(22px);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  /* ── SLIDER (Reka Slider) ───────────────────────────────────────────────*/
+  .ng-slider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    touch-action: none;
+    width: 100%;
+    height: 20px;
+  }
+  .ng-slider-track {
+    position: relative;
+    flex-grow: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-base);
+  }
+  .ng-slider-range {
+    position: absolute;
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--violet), var(--cyan));
+    box-shadow: 0 0 7px rgba(0, 224, 255, 0.45), 0 0 14px rgba(138, 69, 255, 0.3);
+  }
+  .ng-slider-thumb {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--cyan);
+    border: 2px solid var(--bg-darkest);
+    box-shadow: var(--glow-cyan);
+    cursor: grab;
+  }
+  .ng-slider-thumb:active {
+    cursor: grabbing;
+  }
+}

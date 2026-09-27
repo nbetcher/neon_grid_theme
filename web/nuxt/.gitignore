@@ -1,0 +1,13 @@
+node_modules/
+.nuxt/
+.output/
+dist/
+*.log
+.DS_Store
+
+# Self-hosted font binaries are fetched, not committed.
+# `npm run fonts` populates these from Google Fonts (both families are OFL-1.1).
+public/fonts/*.woff2
+public/fonts/*.woff
+public/fonts/LICENSE-*.txt
+public/fonts/manifest.json

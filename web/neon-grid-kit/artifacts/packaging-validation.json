@@ -1,0 +1,135 @@
+{
+  "checkedAt": "2026-09-08T09:38:37.519Z",
+  "scope": "npm pack dry-run file sets and isolated consumer resolution",
+  "packages": [
+    {
+      "name": "@neon-grid/kit-core",
+      "packPassed": true,
+      "exportTargetsPresent": true,
+      "relativeImportAndAssetClosure": true,
+      "dependenciesDeclared": true,
+      "bytes": 48470,
+      "files": [
+        "NOTICE.md",
+        "README.md",
+        "dist/_tokens.scss",
+        "dist/fonts/LICENSE-Orbitron.txt",
+        "dist/fonts/LICENSE-ShareTechMono.txt",
+        "dist/fonts/orbitron-variable.woff2",
+        "dist/fonts/share-tech-mono-400.woff2",
+        "dist/tailwind.css",
+        "dist/theme.css",
+        "dist/tokens.css",
+        "package.json",
+        "src/decorations.js",
+        "src/index.d.ts",
+        "src/index.js",
+        "tokens/neon-grid.tokens.json"
+      ],
+      "missingDocs": []
+    },
+    {
+      "name": "@neon-grid/kit-react",
+      "packPassed": true,
+      "exportTargetsPresent": true,
+      "relativeImportAndAssetClosure": true,
+      "dependenciesDeclared": true,
+      "bytes": 4062,
+      "files": [
+        "README.md",
+        "dist/index.d.ts",
+        "dist/index.js",
+        "package.json"
+      ],
+      "missingDocs": []
+    },
+    {
+      "name": "@neon-grid/kit-vue",
+      "packPassed": true,
+      "exportTargetsPresent": true,
+      "relativeImportAndAssetClosure": true,
+      "dependenciesDeclared": true,
+      "bytes": 4132,
+      "files": [
+        "README.md",
+        "package.json",
+        "src/Button.vue",
+        "src/context.ts",
+        "src/Identity.vue",
+        "src/index.ts",
+        "src/NavItem.vue",
+        "src/Panel.vue",
+        "src/plugin.ts",
+        "src/Signal.vue",
+        "src/Theme.vue"
+      ],
+      "missingDocs": []
+    },
+    {
+      "name": "@neon-grid/kit-svelte",
+      "packPassed": true,
+      "exportTargetsPresent": true,
+      "relativeImportAndAssetClosure": true,
+      "dependenciesDeclared": true,
+      "bytes": 4454,
+      "files": [
+        "README.md",
+        "dist/Button.svelte",
+        "dist/Button.svelte.d.ts",
+        "dist/Identity.svelte",
+        "dist/Identity.svelte.d.ts",
+        "dist/index.d.ts",
+        "dist/index.js",
+        "dist/NavItem.svelte",
+        "dist/NavItem.svelte.d.ts",
+        "dist/Panel.svelte",
+        "dist/Panel.svelte.d.ts",
+        "dist/Signal.svelte",
+        "dist/Signal.svelte.d.ts",
+        "dist/Theme.svelte",
+        "dist/Theme.svelte.d.ts",
+        "dist/types.d.ts",
+        "dist/types.js",
+        "package.json"
+      ],
+      "missingDocs": []
+    }
+  ],
+  "findings": [
+    {
+      "package": "@neon-grid/kit-core",
+      "issue": "Declared package documentation is absent from current pack file set",
+      "missing": [
+        "README.md",
+        "NOTICE.md"
+      ]
+    }
+  ],
+  "consumers": [
+    {
+      "framework": "core",
+      "noDOMImport": true,
+      "decorations": true
+    },
+    {
+      "framework": "react",
+      "isolatedPackedFilesBuild": true,
+      "sourceKitWorkspaceLinks": false,
+      "installedPeerPackagesReused": true
+    },
+    {
+      "framework": "vue",
+      "isolatedPackedFilesBuild": true,
+      "sourceKitWorkspaceLinks": false,
+      "installedPeerPackagesReused": true
+    },
+    {
+      "framework": "svelte",
+      "isolatedPackedFilesBuild": true,
+      "sourceKitWorkspaceLinks": false,
+      "installedPeerPackagesReused": true
+    }
+  ],
+  "finalPackVerifiedAt": "2026-09-08T09:44:59.665Z",
+  "documentationFindingResolved": true
+}

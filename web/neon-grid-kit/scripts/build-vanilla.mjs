@@ -1,0 +1,16 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const example = path.join(root,'examples/vanilla');
+const out = path.join(example,'dist');
+await fs.mkdir(path.join(out,'theme'),{recursive:true});
+await fs.cp(path.join(root,'packages/core/dist'),path.join(out,'theme'),{recursive:true});
+for (const name of ['index.js','decorations.js']) await fs.copyFile(path.join(root,'packages/core/src',name),path.join(out,'theme',name));
+let html = await fs.readFile(path.join(example,'index.html'),'utf8');
+html = html.replace('../../packages/core/dist/theme.css','./theme/theme.css').replace('../../index.html','/').replace('../../README.md','./README.md');
+await fs.writeFile(path.join(out,'index.html'),html);
+await fs.copyFile(path.join(example,'app.js'),path.join(out,'app.js'));
+await fs.writeFile(path.join(out,'theme.js'),(await fs.readFile(path.join(example,'theme.js'),'utf8')).replace('../../packages/core/src/index.js','./theme/index.js'));
+await fs.copyFile(path.join(example,'README.md'),path.join(out,'README.md'));
+console.log('Built vanilla standalone HTML/CSS/JS with local fonts.');

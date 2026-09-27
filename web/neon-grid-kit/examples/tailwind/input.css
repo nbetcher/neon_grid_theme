@@ -1,0 +1,4 @@
+@import "tailwindcss";
+@import "@neon-grid/kit-core/theme.css";
+@import "@neon-grid/kit-core/tailwind.css";
+@source "./index.html";

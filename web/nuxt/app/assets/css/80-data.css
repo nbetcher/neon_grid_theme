@@ -1,0 +1,735 @@
+/* 80-data.css — tables, bars, rings, timeline, comments, feeds, empty/loading. */
+@layer neon.data {
+  /* ── TRON TABLE ─────────────────────────────────────────────────────────*/
+  .table-container {
+    overflow-x: auto;
+    margin: 0 -4px;
+    padding: 0 4px;
+  }
+  .tron-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .tron-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg-dark);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 0.84rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-label);
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-glow-dim);
+    user-select: none;
+    white-space: nowrap;
+  }
+  .tron-table thead th.sortable {
+    cursor: pointer;
+  }
+  .tron-table thead th.sortable:hover {
+    color: var(--cyan);
+  }
+  .tron-table thead th[aria-sort='ascending'],
+  .tron-table thead th[aria-sort='descending'] {
+    color: var(--cyan);
+  }
+  .tron-table thead th .sort-caret {
+    margin-left: 4px;
+    opacity: 0.8;
+  }
+  .tron-table thead th.num,
+  .tron-table tbody td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .tron-table tbody tr {
+    transition: var(--transition);
+  }
+  .tron-table tbody tr.clickable {
+    cursor: pointer;
+  }
+  .tron-table tbody tr:hover {
+    background: var(--bg-panel-hover);
+    box-shadow: inset 0 0 20px rgba(0, 224, 255, 0.03);
+  }
+  .tron-table tbody tr.selected {
+    background: rgba(0, 224, 255, 0.07);
+    box-shadow: inset 3px 0 0 var(--cyan);
+  }
+  .tron-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 1.04rem;
+    vertical-align: middle;
+  }
+  .tron-table.compact tbody td,
+  .tron-table.compact thead th {
+    padding: 6px 10px;
+    font-size: 0.92rem;
+  }
+  .tron-table.mono tbody td {
+    font-family: var(--font-mono);
+  }
+
+  /* ── DIST BAR (stacked severity/state bar) ──────────────────────────────*/
+  .dist-bar {
+    display: flex;
+    width: 100%;
+    height: 22px;
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+    border: 1px solid var(--border-base);
+    background: var(--bg-input);
+    /* The container carries the outer bloom — overflow:hidden clips per-segment
+       shadows, so the glow has to live on the parent. */
+    box-shadow: 0 0 11px rgba(0, 224, 255, 0.22), 0 0 22px rgba(255, 59, 92, 0.1);
+  }
+  .dist-bar .seg {
+    height: 100%;
+    transition: width var(--transition);
+    min-width: 0;
+    /* inner sheen makes each coloured segment read as backlit */
+    box-shadow: inset 0 0 9px rgba(255, 255, 255, 0.22);
+  }
+  .dist-bar .seg.seg-critical {
+    background: linear-gradient(90deg, #ff3355, #ff5577);
+  }
+  .dist-bar .seg.seg-high {
+    background: var(--red);
+  }
+  .dist-bar .seg.seg-medium {
+    background: var(--orange);
+  }
+  .dist-bar .seg.seg-low {
+    background: var(--cyan);
+  }
+  .dist-bar .seg.seg-cleanup {
+    background: var(--text-dim);
+  }
+  .dist-bar .seg.seg-resolved {
+    background: var(--green);
+  }
+  .dist-bar .seg.seg-rest {
+    background: var(--border-base);
+  }
+
+  .dist-legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.94rem;
+    color: var(--text-secondary);
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* ── HORIZONTAL LABELLED BARS ───────────────────────────────────────────*/
+  .hbar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+  .hbar-label {
+    width: 88px;
+    font-size: 0.94rem;
+    color: var(--text-secondary);
+    text-align: right;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hbar-track {
+    flex: 1;
+    height: 16px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-xs);
+    /* visible, so the fill's bloom can spill past the track edge */
+    overflow: visible;
+  }
+  .hbar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--violet), var(--cyan));
+    border-radius: var(--radius-xs);
+    transition: width var(--transition);
+    min-width: 2px;
+    box-shadow: 0 0 7px rgba(0, 224, 255, 0.45), 0 0 14px rgba(138, 69, 255, 0.3);
+  }
+  .hbar-cnt {
+    width: 34px;
+    font-family: var(--font-display);
+    font-size: 0.94rem;
+    color: var(--text-primary);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Generic thin progress track, used by cards and rows. */
+  .ng-prog-track {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-darkest);
+    border: 1px solid var(--border-base);
+    border-radius: 5px;
+    overflow: visible;
+    min-width: 60px;
+  }
+  .ng-prog-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease;
+  }
+  .ng-prog-pct {
+    font-family: var(--font-display);
+    font-size: 0.84rem;
+    color: var(--text-primary);
+    width: 38px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── RING (SVG arc gauge) ───────────────────────────────────────────────*/
+  .ng-ring {
+    position: relative;
+    display: inline-block;
+  }
+  .ng-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .ng-ring .rr-track {
+    fill: none;
+    stroke: rgba(0, 224, 255, 0.13);
+  }
+  .ng-ring .rr-fill {
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 5px rgba(0, 224, 255, 0.55)) drop-shadow(0 0 10px rgba(0, 255, 149, 0.3));
+  }
+  .ng-ring .rr-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    text-align: center;
+  }
+  .ng-ring .rr-pct {
+    font-family: var(--font-display);
+    font-size: 2.1rem;
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(90deg, var(--green), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ng-ring .rr-label {
+    font-size: 0.66rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-label);
+  }
+
+  /* ── TIMELINE ───────────────────────────────────────────────────────────*/
+  .timeline {
+    position: relative;
+    padding-left: 22px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background: var(--border-glow-dim);
+  }
+  .tl-entry {
+    position: relative;
+    padding-bottom: 16px;
+  }
+  .tl-entry::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 4px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .tl-entry.created::before {
+    background: var(--violet);
+    box-shadow: 0 0 8px var(--violet);
+  }
+  .tl-entry.danger::before {
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+  }
+  .tl-entry.ok::before {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+  .tl-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 0.94rem;
+  }
+  .tl-time {
+    color: var(--text-label);
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .tl-change {
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-top: 2px;
+  }
+  .tl-change .old {
+    color: var(--text-label);
+  }
+  .tl-change .arrow {
+    color: var(--cyan);
+    margin: 0 4px;
+  }
+  .tl-change .new {
+    color: var(--green);
+  }
+  .tl-note {
+    color: var(--text-secondary);
+    font-size: 0.94rem;
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  /* ── COMMENTS ───────────────────────────────────────────────────────────*/
+  .comment {
+    background: var(--bg-input);
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-xs);
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .comment-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .comment-author {
+    color: var(--cyan);
+    font-size: 0.94rem;
+    text-shadow: var(--glyph-glow);
+  }
+  .comment-time {
+    color: var(--text-label);
+    font-size: 0.84rem;
+  }
+  .comment-body {
+    font-size: 1.04rem;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* ── EVENT FEED ─────────────────────────────────────────────────────────
+     This is the shape the alert stream wants: left accent rule, icon tile,
+     ref + summary, right-aligned time, `.fresh` flash on arrival. --------- */
+  .event-feed {
+    max-height: 560px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .event-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-xs);
+    border-left: 2px solid var(--border-glow-dim);
+    transition: var(--transition);
+  }
+  .event-row:hover {
+    background: var(--bg-panel-hover);
+  }
+  .event-row.clickable {
+    cursor: pointer;
+  }
+  .event-row.fresh {
+    animation: evFlash 1.2s ease-out;
+  }
+  .event-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .event-main {
+    flex: 1;
+    min-width: 0;
+  }
+  .event-ref {
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    color: var(--cyan);
+    text-shadow: var(--glyph-glow);
+  }
+  .event-summary {
+    font-size: 0.86rem;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .event-time {
+    font-size: 0.74rem;
+    color: var(--text-label);
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── DETAIL GRID ────────────────────────────────────────────────────────*/
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px 16px;
+    margin: 16px 0;
+  }
+  .detail-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .detail-field.full {
+    grid-column: 1 / -1;
+  }
+  .detail-field .df-label {
+    font-family: var(--font-display);
+    font-size: 0.66rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-label);
+  }
+  .detail-field .df-value {
+    font-size: 1.04rem;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .detail-field .df-value.mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ── CONTENT SECTIONS (label + body) ────────────────────────────────────*/
+  .ng-section {
+    margin-top: 14px;
+  }
+  .ng-section .sec-label {
+    font-family: var(--font-display);
+    font-size: 0.69rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 4px;
+    opacity: 0.8;
+  }
+  .ng-section .sec-text {
+    font-size: 1.04rem;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .resolution-block {
+    margin-top: 14px;
+    background: rgba(0, 255, 149, 0.06);
+    border: 1px solid rgba(0, 255, 149, 0.25);
+    border-radius: var(--radius-xs);
+    padding: 12px 14px;
+  }
+  .resolution-block .sec-label {
+    color: var(--green);
+  }
+  .resolution-block .sec-text {
+    color: var(--green-text);
+  }
+
+  /* ── RECORD ROW (accordion list item) ───────────────────────────────────
+     Was `.issue-row` in the source. Renamed to a domain-neutral name; the old
+     names are kept as aliases so ported markup keeps working. ------------ */
+  .ng-record-list,
+  .issue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .ng-record-row,
+  .issue-row {
+    background: var(--bg-input);
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-sm);
+    position: relative;
+    overflow: hidden;
+    padding-left: 4px;
+    transition: var(--transition);
+  }
+  .ng-record-row:hover,
+  .issue-row:hover {
+    border-color: var(--border-glow-dim);
+  }
+  .ng-record-row .istripe,
+  .issue-row .istripe {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+  }
+  .ng-record-head,
+  .issue-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px 8px 13px;
+    cursor: pointer;
+    flex-wrap: wrap;
+    width: 100%;
+    text-align: left;
+  }
+  .ng-record-head:hover,
+  .issue-head:hover {
+    background: rgba(0, 224, 255, 0.02);
+  }
+  .issue-sev-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .issue-slug {
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    color: var(--violet-text);
+    flex-shrink: 0;
+  }
+  .issue-title {
+    flex: 1;
+    font-size: 0.97rem;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 120px;
+  }
+  .issue-caret {
+    color: var(--text-label);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    transition: transform var(--transition);
+  }
+  .ng-record-row[data-open='true'] .issue-caret {
+    transform: rotate(180deg);
+  }
+  .ng-record-body,
+  .issue-body {
+    padding: 6px 14px 14px 16px;
+    border-top: 1px solid rgba(0, 224, 255, 0.12);
+  }
+  .issue-loc {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--cyan);
+    opacity: 0.8;
+  }
+
+  /* ── SOURCE CARD (was `.agent-card`) ────────────────────────────────────
+     Reused for SDR / stream / feed health: name, state dot, activity line,
+     progress, heartbeat age. "Which sources are dark" needs exactly this. */
+  .ng-source-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .ng-source-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+    border-top: 3px solid var(--cyan);
+  }
+  .ng-source-card.working {
+    box-shadow: 0 0 16px rgba(0, 255, 149, 0.05);
+  }
+  .ng-source-card.dark {
+    border-top-color: var(--red);
+    box-shadow: 0 0 16px rgba(255, 59, 92, 0.06);
+  }
+  .ng-source-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .ng-source-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--bg-darkest);
+    flex-shrink: 0;
+    box-shadow: 0 0 12px -1px rgba(0, 224, 255, 0.45), inset 0 0 6px rgba(255, 255, 255, 0.18);
+  }
+  .ng-source-id {
+    flex: 1;
+    min-width: 0;
+  }
+  .ng-source-name {
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+  }
+  .ng-source-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.76rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .ng-source-state .st-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ng-source-state.working {
+    color: var(--green);
+  }
+  .ng-source-state.working .st-dot {
+    background: var(--green);
+    box-shadow: var(--glow-green);
+    animation: dotPulse 1.6s ease-in-out infinite;
+  }
+  .ng-source-state.idle {
+    color: var(--text-label);
+  }
+  .ng-source-state.idle .st-dot {
+    background: var(--text-dim);
+  }
+  .ng-source-state.blocked {
+    color: var(--red-text);
+  }
+  .ng-source-state.blocked .st-dot {
+    background: var(--red);
+    box-shadow: var(--glow-red);
+  }
+  .ng-source-activity {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    margin-bottom: 8px;
+    min-height: 2.5em;
+  }
+  .ng-source-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: var(--text-label);
+  }
+
+  /* ── EMPTY / LOADING ────────────────────────────────────────────────────*/
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-label);
+  }
+  .empty-state .ng-icon {
+    font-size: 4.45rem;
+    margin-bottom: 12px;
+    display: block;
+    color: var(--border-glow-dim);
+  }
+  .empty-state p {
+    font-size: 1.04rem;
+  }
+  .empty-state .empty-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-glow-dim);
+    border-top-color: var(--cyan);
+    border-radius: 50%;
+    animation: spinRing 0.8s linear infinite;
+  }
+  .loading-spinner.sm {
+    width: 14px;
+    height: 14px;
+    border-width: 1.5px;
+  }
+  .loading-spinner.lg {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+  .page-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px;
+    color: var(--text-label);
+    font-size: 1.04rem;
+  }
+}

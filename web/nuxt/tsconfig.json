@@ -1,0 +1,31 @@
+{
+  // The layer itself is not a Nuxt app — it has no `.nuxt/`. Type-checking happens
+  // through the playground app (`npm run typecheck` → `nuxi typecheck playground`),
+  // which generates the real project references. This file exists so that editors
+  // opening the layer in isolation get sane defaults for `shared/` and `scripts/`.
+  //
+  // A CONSUMING app keeps the standard Nuxt 4 root tsconfig instead:
+  //   { "files": [], "references": [
+  //       { "path": "./.nuxt/tsconfig.app.json" },
+  //       { "path": "./.nuxt/tsconfig.server.json" },
+  //       { "path": "./.nuxt/tsconfig.shared.json" },
+  //       { "path": "./.nuxt/tsconfig.node.json" } ] }
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true
+  },
+  "include": ["shared/**/*.ts", "scripts/**/*.mjs", "nuxt.config.ts"],
+  "exclude": ["node_modules", "playground/.nuxt", "playground/.output", ".nuxt", "dist"]
+}

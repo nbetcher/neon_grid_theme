@@ -1,0 +1,16 @@
+{
+  "name": "@neon-grid/kit-core",
+  "version": "1.0.0",
+  "description": "Approved Neon Grid hybrid theme, design tokens, decorations and motion controller",
+  "type": "module",
+  "sideEffects": ["**/*.css"],
+  "exports": {
+    ".": {"types": "./src/index.d.ts", "import": "./src/index.js"},
+    "./theme.css": "./dist/theme.css",
+    "./tokens.css": "./dist/tokens.css",
+    "./tokens.json": "./tokens/neon-grid.tokens.json",
+    "./tailwind.css": "./dist/tailwind.css",
+    "./scss": "./dist/_tokens.scss"
+  },
+  "files": ["src/index.js", "src/index.d.ts", "src/decorations.js", "dist", "tokens", "README.md", "NOTICE.md"]
+}

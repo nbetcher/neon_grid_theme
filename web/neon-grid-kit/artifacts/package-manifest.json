@@ -1,0 +1,85 @@
+{
+  "createdAt": "2026-09-08T09:44:59.663Z",
+  "packages": [
+    {
+      "name": "@neon-grid/kit-core",
+      "filename": "neon-grid-kit-core-1.0.0.tgz",
+      "integrity": "sha512-qRn6yZCMaCqgenvAv7kRf2xFj3YqNuXKxW4zIOwPK3okRiMHYOT6hAWrZFq+BwQQPrEsISHyQJb5YPWhBCB1bw==",
+      "size": 48470,
+      "files": [
+        "NOTICE.md",
+        "README.md",
+        "dist/_tokens.scss",
+        "dist/fonts/LICENSE-Orbitron.txt",
+        "dist/fonts/LICENSE-ShareTechMono.txt",
+        "dist/fonts/orbitron-variable.woff2",
+        "dist/fonts/share-tech-mono-400.woff2",
+        "dist/tailwind.css",
+        "dist/theme.css",
+        "dist/tokens.css",
+        "package.json",
+        "src/decorations.js",
+        "src/index.d.ts",
+        "src/index.js",
+        "tokens/neon-grid.tokens.json"
+      ]
+    },
+    {
+      "name": "@neon-grid/kit-react",
+      "filename": "neon-grid-kit-react-1.0.0.tgz",
+      "integrity": "sha512-5gdO4ELAFyrH7ihXTlZeceHWIFv9A6YOyaArrcbTnLaryMwepnl2dVhfgfnD6Z4L1T7x0XCf4NlsVqYPCIx2vg==",
+      "size": 4062,
+      "files": [
+        "README.md",
+        "dist/index.d.ts",
+        "dist/index.js",
+        "package.json"
+      ]
+    },
+    {
+      "name": "@neon-grid/kit-vue",
+      "filename": "neon-grid-kit-vue-1.0.0.tgz",
+      "integrity": "sha512-257jN9kMndtFZLXkSuMe9xP12C3WyVlwdM56LndIoa6Raijyv4vzizVgRDja9bWXVabREbtVPXBe4NgmEcdLPg==",
+      "size": 4132,
+      "files": [
+        "README.md",
+        "package.json",
+        "src/Button.vue",
+        "src/context.ts",
+        "src/Identity.vue",
+        "src/index.ts",
+        "src/NavItem.vue",
+        "src/Panel.vue",
+        "src/plugin.ts",
+        "src/Signal.vue",
+        "src/Theme.vue"
+      ]
+    },
+    {
+      "name": "@neon-grid/kit-svelte",
+      "filename": "neon-grid-kit-svelte-1.0.0.tgz",
+      "integrity": "sha512-TpCz0myIUHrh/7GGPdcIIj+oCZSWAV6d+0OZv866drXkSZTeqWEzgY9R85qUr7oJe+Llp+QTszMzOgGQjCm+nw==",
+      "size": 4454,
+      "files": [
+        "README.md",
+        "dist/Button.svelte",
+        "dist/Button.svelte.d.ts",
+        "dist/Identity.svelte",
+        "dist/Identity.svelte.d.ts",
+        "dist/index.d.ts",
+        "dist/index.js",
+        "dist/NavItem.svelte",
+        "dist/NavItem.svelte.d.ts",
+        "dist/Panel.svelte",
+        "dist/Panel.svelte.d.ts",
+        "dist/Signal.svelte",
+        "dist/Signal.svelte.d.ts",
+        "dist/Theme.svelte",
+        "dist/Theme.svelte.d.ts",
+        "dist/types.d.ts",
+        "dist/types.js",
+        "package.json"
+      ]
+    }
+  ]
+}

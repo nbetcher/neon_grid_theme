@@ -1,0 +1,42 @@
+/* ============================================================================
+ * Neon Grid — layer entry point.
+ *
+ * A deep blue-black substrate lit by a full spectrum of neon. Glowing strokes,
+ * gradient hairlines, letter-spaced display type over terminal mono.
+ *
+ *   GRID: yes.  SCANLINES: intentionally omitted — on every platform.
+ *
+ * ── CASCADE LAYERS ──────────────────────────────────────────────────────────
+ * The order below is declared once, before any rule exists. Every partial wraps
+ * its own rules in its own layer, so a bundler reordering the @imports cannot
+ * break the cascade. Two consequences that matter:
+ *
+ *  1. The CONSUMING APP wins by default. App CSS is unlayered, and unlayered
+ *     styles beat every layer. Overriding `.panel` in Verde Watch needs one flat
+ *     class — no specificity war, no !important.
+ *  2. The two-class specificity hacks in the petite-vue source are deleted.
+ *     `.chip.badge-info` existed only because `.chip` was declared after
+ *     `.badge-info`; now badges live in a later layer than chips and simply win.
+ *
+ * `@font-face` is deliberately NOT inside a layer — font registration is not a
+ * cascade concern and layered @font-face has historically been buggy.
+ * ==========================================================================*/
+
+@layer neon.reset, neon.base, neon.substrate, neon.layout, neon.surfaces,
+       neon.controls, neon.indicators, neon.data, neon.cockpit, neon.charts,
+       neon.motion, neon.a11y;
+
+@import './00-reset.css';
+@import './05-fonts.css';
+@import './10-tokens.css';
+@import './20-base.css';
+@import './30-substrate.css';
+@import './40-layout.css';
+@import './50-surfaces.css';
+@import './60-controls.css';
+@import './70-indicators.css';
+@import './80-data.css';
+@import './85-cockpit.css';
+@import './88-charts.css';
+@import './90-motion.css';
+@import './95-a11y.css';
