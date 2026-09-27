@@ -1,0 +1,197 @@
+/* ============================================================================
+ * 90-motion.css — EVERY @keyframes in the system, plus the reduced-motion block.
+ *
+ * All animation lives here so `prefers-reduced-motion` can be honoured in one
+ * place and audited in one place.
+ *
+ * THE RULE THAT MATTERS: reduced motion must not delete INFORMATION. A pulsing
+ * dot that means "live" and a flash that means "this row just arrived" are
+ * signals, not decoration. Each one below is replaced with a static equivalent
+ * rather than switched off.
+ * ==========================================================================*/
+@layer neon.motion {
+  /* Shared by .live-pill.on .live-dot and every working-state dot. */
+  @keyframes dotPulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(0.85);
+    }
+  }
+
+  /* One-shot burst when a live event lands. */
+  @keyframes liveFlash {
+    0% {
+      transform: scale(2.2);
+      box-shadow: 0 0 18px var(--green);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  /* Brightness pulse for active lifecycle/approval/pending states. Uses filter
+     rather than opacity so the glow pulses with the glyph. */
+  @keyframes lcPulse {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+    50% {
+      filter: brightness(1.4);
+    }
+  }
+
+  @keyframes spinRing {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes toastIn {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes evFlash {
+    0% {
+      background: rgba(0, 224, 255, 0.12);
+    }
+    100% {
+      background: transparent;
+    }
+  }
+
+  @keyframes glyphIn {
+    from {
+      opacity: 0;
+      transform: translateX(8px) scale(0.7);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Light-cycle tracer along an SVG path. */
+  @keyframes tronTrace {
+    from {
+      stroke-dashoffset: 100;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes radarPing {
+    0% {
+      r: 7px;
+      opacity: 0.85;
+      stroke-width: 1.6;
+    }
+    100% {
+      r: 18px;
+      opacity: 0;
+      stroke-width: 0.4;
+    }
+  }
+
+  /* Modal enter — replaces the animate.css dependency the source used for
+     exactly one effect. */
+  @keyframes ngFadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes ngFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .modal-content[data-state='open'] {
+    animation: ngFadeInUp 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .modal-backdrop[data-state='open'] {
+    animation: ngFadeIn 0.18s ease-out;
+  }
+
+  /* ── REDUCED MOTION ─────────────────────────────────────────────────────*/
+  @media (prefers-reduced-motion: reduce) {
+    /* The 20 s infinite grid drift is a permanent compositor wake on an
+       always-on console. First thing to go. */
+    .grid-bg {
+      animation: none;
+    }
+
+    /* Decorative pulses — off. */
+    .lifecycle-pill.active,
+    .approval-pill,
+    .blockers-pill.blocked,
+    .glyph.gl-pending,
+    .worker-chip.online .ng-icon,
+    .worker-chip.needs-attn,
+    .status-pill.sp-live .ng-icon,
+    .activity-ticker .at-tick,
+    .ng-trace,
+    .ng-ping,
+    .glyph.gl-new,
+    .toast {
+      animation: none !important;
+    }
+
+    /* Spinners STAY. A frozen spinner reads as "the app hung", which is worse
+       than motion — just slow it to something non-distracting. */
+    .loading-spinner,
+    .triad-chip.tc-running .tlead,
+    .worker-chip.retrying .ng-icon,
+    .worker-chip.waiting .ng-icon {
+      animation-duration: 2s !important;
+    }
+
+    /* SIGNAL-BEARING animations get a static replacement, never removal. */
+    .live-pill.on .live-dot,
+    .ng-source-state.working .st-dot {
+      animation: none;
+      /* solid ring instead of a pulse — still obviously "on" */
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
+    .event-row.fresh {
+      animation: none;
+      outline: 1px solid var(--cyan);
+      outline-offset: -1px;
+    }
+    .live-pill .live-dot.flash {
+      animation: none;
+      outline: 2px solid var(--green);
+      outline-offset: 3px;
+    }
+
+    /* Transitions collapse but do not vanish (0 breaks some transitionend
+       handlers; 0.01ms fires them immediately). */
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

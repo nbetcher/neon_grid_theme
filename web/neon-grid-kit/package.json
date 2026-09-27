@@ -1,0 +1,26 @@
+{
+  "name": "neon-grid-kit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*", "examples/*"],
+  "engines": {"node": "^22.19.0 || ^24.11.0 || >=26.0.0"},
+  "scripts": {
+    "build:core": "node scripts/build-core.mjs",
+    "check:generated": "node scripts/build-core.mjs --check",
+    "test:core": "node --test tests/core.test.mjs",
+    "build": "node scripts/build-all.mjs",
+    "preview": "node scripts/preview.mjs",
+    "package": "node scripts/package.mjs",
+    "test:browser": "node tests/browser.mjs",
+    "check": "npm run check:generated && npm run test:core && npm run build && npm run test:browser"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "playwright": "1.63.0",
+    "postcss": "8.5.28",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "vite": "8.2.2"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@neon-grid/kit-svelte",
+  "version": "1.0.0",
+  "description": "Native Svelte 5 components for the Neon Grid theme",
+  "type": "module",
+  "files": ["dist", "README.md"],
+  "sideEffects": ["**/*.css"],
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "svelte-package -i src -o dist",
+    "check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings"
+  },
+  "dependencies": { "@neon-grid/kit-core": "1.0.0" },
+  "peerDependencies": { "svelte": "^5.57.0" },
+  "devDependencies": {
+    "@sveltejs/package": "2.5.8",
+    "svelte": "5.57.0",
+    "svelte-check": "4.7.6",
+    "typescript": "6.0.3"
+  }
+}

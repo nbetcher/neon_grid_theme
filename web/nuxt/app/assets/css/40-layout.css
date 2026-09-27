@@ -1,0 +1,223 @@
+/* 40-layout.css — app shell: wrapper, header, nav, main, responsive stages. */
+@layer neon.layout {
+  .app-wrapper {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────────────────────*/
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: linear-gradient(180deg, var(--bg-dark), var(--bg-darkest));
+    border-bottom: var(--border-width) solid var(--border-glow-dim);
+    box-shadow: 0 2px 22px rgba(0, 224, 255, 0.12);
+    padding: 0 22px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .header-logo .logo-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--cyan), var(--violet));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--glow-cyan-strong);
+    font-size: 18px;
+    color: var(--bg-darkest);
+  }
+  .header-logo .logo-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.12rem;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, var(--cyan), var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+  }
+
+  .header-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px;
+    border-radius: var(--radius-lg);
+    background: var(--bg-panel);
+    border: var(--border-width) solid var(--border-glow-dim);
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .header-chip .ng-icon {
+    color: var(--violet-text);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  /* Grouped icon-only utility buttons, set off from the status area. */
+  .header-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding-left: 10px;
+    border-left: 1px solid var(--border-base);
+  }
+
+  /* Full-width alert strip. Deliberately NOT in the header — it must never
+     compress the nav, and on this system it carries "sources are dark". */
+  .auth-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 20px;
+    background: rgba(255, 149, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 149, 0, 0.35);
+    color: var(--orange);
+    font-size: 0.9rem;
+  }
+  .auth-banner .ng-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .auth-banner .banner-end {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .auth-banner.banner-danger {
+    background: rgba(255, 59, 92, 0.1);
+    border-bottom-color: rgba(255, 59, 92, 0.4);
+    color: var(--red-text);
+  }
+  .auth-banner.banner-info {
+    background: rgba(0, 224, 255, 0.08);
+    border-bottom-color: var(--border-glow-dim);
+    color: var(--cyan);
+  }
+
+  /* ── NAV ────────────────────────────────────────────────────────────────*/
+  .app-nav {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .nav-btn {
+    padding: 7px 13px;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .nav-btn:hover {
+    color: var(--cyan);
+    background: rgba(0, 224, 255, 0.06);
+    border-color: var(--border-glow-dim);
+    text-decoration: none;
+  }
+  .nav-btn.active,
+  .nav-btn.router-link-active {
+    color: var(--cyan);
+    background: rgba(0, 224, 255, 0.1);
+    border-color: var(--border-glow-dim);
+    box-shadow: var(--glow-cyan);
+  }
+  .nav-btn .ng-icon {
+    font-size: 1.08rem;
+  }
+
+  /* ── MAIN ───────────────────────────────────────────────────────────────*/
+  .app-main {
+    flex: 1;
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .app-main.wide {
+    max-width: none;
+  }
+
+  /* ── RESPONSIVE ─────────────────────────────────────────────────────────
+     The header degrades in stages so it stays a single 64px row as long as
+     possible. Breakpoints are the source's: 1180 / 1010 / 880 / 760. -----*/
+  @media (max-width: 1180px) {
+    .header-chip {
+      display: none;
+    }
+  }
+  @media (max-width: 1010px) {
+    .nav-btn .nav-label {
+      display: none;
+    }
+    .nav-btn {
+      padding: 7px 10px;
+    }
+    .app-nav {
+      gap: 2px;
+    }
+  }
+  @media (max-width: 760px) {
+    .app-header {
+      height: auto;
+      min-height: 56px;
+      padding: 8px 12px;
+      flex-wrap: wrap;
+    }
+    .header-left {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .app-nav {
+      margin-left: 0;
+    }
+    .app-main {
+      padding: 12px;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+/* ============================================================================
+ * 30-substrate.css — the animated grid backdrop.
+ *
+ * GRID: yes.  SCANLINES: intentionally omitted on every platform. Do not add a
+ * scanline overlay here or anywhere else; it is a standing design decision, not
+ * an oversight. There is no scanline rule in the petite-vue source either — this
+ * was verified line by line.
+ *
+ * Everything is driven by tokens so the glow-level control can dim the grid:
+ *   --grid-size   42px    cell
+ *   --grid-alpha  .05     line alpha (soft .035, off .02)
+ *   --grid-drift  40px    the 20 s translate distance
+ * ==========================================================================*/
+@layer neon.substrate {
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+    animation: gridShift 20s linear infinite;
+    /* An always-on console runs this forever. Promote it once so the compositor
+       does not re-rasterise the whole viewport every frame. */
+    will-change: background-position;
+  }
+
+  /* Cyan vignette from the top edge — the "horizon" of the grid. */
+  .grid-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0, 224, 255, 0.06), transparent 60%);
+  }
+
+  /* Set by <NgGridBg> when document.visibilityState !== 'visible'. A background
+     tab has no business waking the compositor every frame for 20 s forever. */
+  .grid-bg[data-paused='true'] {
+    animation-play-state: paused;
+  }
+
+  @keyframes gridShift {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: var(--grid-drift) var(--grid-drift);
+    }
+  }
+}

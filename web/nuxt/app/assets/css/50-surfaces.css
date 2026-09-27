@@ -1,0 +1,547 @@
+/* 50-surfaces.css — panels, stat cards, KPI tiles, chart panels, modals, toasts. */
+@layer neon.surfaces {
+  /* ── PANEL ───────────────────────────────────────────────────────────────
+     The gradient hairline across the top (`::before`) is the single most
+     recognisable Neon Grid detail. It is inset 20px on each side so it reads as
+     a light bar rather than a border. ------------------------------------- */
+  .panel {
+    background: var(--bg-panel);
+    border: var(--border-width) solid var(--border-glow-dim);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.5;
+  }
+  .panel.flush {
+    margin-bottom: 0;
+  }
+  .panel.pad-none {
+    padding: 0;
+  }
+  /* Opt-in, NOT a default: content-visibility skips layout/paint for off-screen
+     panels, but it also breaks sticky table headers inside them and can cause
+     scroll-anchor jumps. Add `.defer` to long lists of static panels only. */
+  .panel.defer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 320px;
+  }
+  /* Accent variants — border + hairline recoloured together. */
+  .panel.accent-red::before {
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+  }
+  .panel.accent-red {
+    border-color: rgba(255, 59, 92, 0.45);
+  }
+  .panel.accent-green::before {
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+  }
+  .panel.accent-green {
+    border-color: rgba(0, 255, 149, 0.4);
+  }
+  .panel.accent-orange::before {
+    background: linear-gradient(90deg, transparent, var(--orange), transparent);
+  }
+  .panel.accent-orange {
+    border-color: rgba(255, 149, 0, 0.45);
+  }
+  .panel.accent-violet::before {
+    background: linear-gradient(90deg, transparent, var(--violet), transparent);
+  }
+  .panel.accent-violet {
+    border-color: rgba(138, 69, 255, 0.45);
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 224, 255, 0.16);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .panel-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.24rem;
+    letter-spacing: 1px;
+    color: var(--cyan);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: var(--glyph-glow);
+  }
+  .panel-title .ng-icon {
+    font-size: 1.52rem;
+  }
+  .panel-sub {
+    font-size: 0.9rem;
+    color: var(--text-label);
+  }
+  .panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* Corner arc decorations — pure ornament, pointer-events: none. */
+  .panel-arc {
+    position: absolute;
+    border: 1px solid rgba(0, 224, 255, 0.08);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .panel-arc-tl {
+    top: -30px;
+    left: -30px;
+    width: 80px;
+    height: 80px;
+  }
+  .panel-arc-br {
+    bottom: -30px;
+    right: -30px;
+    width: 80px;
+    height: 80px;
+  }
+
+  .panel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .panel-grid > .panel {
+    margin-bottom: 0;
+  }
+  .panel-span-2 {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 760px) {
+    .panel-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ── STAT CARD ──────────────────────────────────────────────────────────*/
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 760px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .stat-card {
+    background: var(--bg-panel);
+    border: var(--border-width) solid var(--border-glow-dim);
+    border-radius: var(--radius);
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.4;
+  }
+  .stat-card.alert::before {
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    opacity: 0.6;
+  }
+  .stat-card .stat-label {
+    font-family: var(--font-display);
+    font-size: 0.69rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-label);
+    margin-bottom: 6px;
+  }
+  /* drop-shadow, NOT text-shadow: the glyphs are gradient-clipped with
+     -webkit-text-fill-color: transparent, which text-shadow paints behind. */
+  .stat-card .stat-value {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 9px rgba(0, 224, 255, 0.5)) drop-shadow(0 0 20px rgba(0, 224, 255, 0.22));
+  }
+  .stat-card.alert .stat-value {
+    background: linear-gradient(90deg, var(--red), var(--orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 9px rgba(255, 59, 92, 0.55)) drop-shadow(0 0 20px rgba(255, 149, 0, 0.22));
+  }
+  .stat-card.positive .stat-value {
+    background: linear-gradient(90deg, var(--green), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 9px rgba(0, 255, 149, 0.5)) drop-shadow(0 0 20px rgba(0, 224, 255, 0.22));
+  }
+  .stat-card .stat-icon {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 2.01rem;
+    color: var(--cyan);
+    text-shadow: 0 0 12px rgba(0, 224, 255, 0.55);
+  }
+  .stat-card.alert .stat-icon {
+    color: var(--red);
+    text-shadow: 0 0 12px rgba(255, 59, 92, 0.55);
+  }
+  .stat-card .stat-foot {
+    font-size: 0.8rem;
+    color: var(--text-label);
+    margin-top: 4px;
+  }
+
+  /* ── KPI TILE (sparkline headline row) ──────────────────────────────────*/
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .kpi-tile {
+    position: relative;
+    background: var(--bg-panel);
+    border: var(--border-width) solid var(--border-glow-dim);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    overflow: hidden;
+    box-shadow: var(--glow-cyan);
+  }
+  .kpi-tile .kpi-label {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.62rem;
+    color: var(--text-label);
+  }
+  .kpi-tile .kpi-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.2rem;
+    line-height: 1.15;
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 9px rgba(0, 224, 255, 0.5)) drop-shadow(0 0 20px rgba(0, 224, 255, 0.22));
+  }
+  .kpi-tile .kpi-delta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+  }
+  .kpi-tile .kpi-delta.up {
+    color: var(--green);
+  }
+  .kpi-tile .kpi-delta.down {
+    color: var(--red-text);
+  }
+  .kpi-tile .kpi-spark {
+    position: absolute;
+    right: 8px;
+    bottom: 6px;
+    width: 96px;
+    height: 38px;
+    opacity: 0.9;
+  }
+
+  /* ── CHART PANEL ────────────────────────────────────────────────────────*/
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 20px;
+  }
+  .chart-panel {
+    position: relative;
+    background: var(--bg-panel);
+    border: var(--border-width) solid var(--border-glow-dim);
+    border-radius: var(--radius);
+    padding: 16px 16px 8px;
+    box-shadow: var(--glow-cyan);
+  }
+  .chart-panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.6;
+  }
+  .chart-panel .panel-title {
+    font-family: var(--font-display);
+    color: var(--cyan);
+    margin: 0 0 12px;
+    letter-spacing: 0.08em;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+  }
+  /* Fixed height so the canvas has something to lay out against — Chart.js
+     `maintainAspectRatio:false` needs a sized parent or it collapses to 0. */
+  .chart-canvas-wrap {
+    position: relative;
+    height: 300px;
+  }
+  .chart-canvas-wrap.tall {
+    height: 360px;
+  }
+  .chart-canvas-wrap.short {
+    height: 200px;
+  }
+  .chart-canvas-wrap canvas {
+    background: transparent; /* the grid shows through */
+  }
+  .chart-span-2 {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 760px) {
+    .chart-canvas-wrap {
+      height: 260px;
+    }
+  }
+
+  /* ── MODAL ──────────────────────────────────────────────────────────────*/
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+  .modal-positioner {
+    position: fixed;
+    inset: 0;
+    z-index: 501;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    pointer-events: none;
+  }
+  .modal-content {
+    pointer-events: auto;
+    background: var(--bg-panel);
+    border: var(--border-width) solid var(--border-glow-dim);
+    border-radius: var(--radius);
+    padding: 28px;
+    width: 100%;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0, 224, 255, 0.1);
+  }
+  .modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--violet), transparent);
+  }
+  .modal-content.modal-sm {
+    max-width: 460px;
+  }
+  .modal-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.24rem;
+    letter-spacing: 1px;
+    color: var(--cyan);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 30px;
+    text-shadow: var(--glyph-glow);
+  }
+  .modal-desc {
+    font-size: 0.9rem;
+    color: var(--text-label);
+    margin-bottom: 8px;
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--text-label);
+    font-size: 1.68rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: var(--transition);
+    border-radius: var(--radius-xs);
+  }
+  .modal-close:hover {
+    color: var(--red);
+  }
+
+  /* Large two-pane modal (65vw x 80vh). Header / scroll / footer are separate
+     flex children so the body scrolls and the chrome does not. */
+  .modal-content.modal-xl {
+    width: 65vw;
+    max-width: 65vw;
+    height: 80vh;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+  .modal-xl .mx-header {
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid rgba(0, 224, 255, 0.18);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .modal-xl .mx-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 28px 28px;
+    min-height: 0;
+  }
+  .modal-xl .mx-footer {
+    flex-shrink: 0;
+    padding: 14px 28px;
+    border-top: 1px solid rgba(0, 224, 255, 0.18);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--bg-panel);
+  }
+  .mx-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 28px;
+  }
+  .mx-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .mx-rail-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+  .mx-title {
+    font-family: var(--font-display);
+    font-size: 1.32rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin: 6px 0 4px;
+  }
+  @media (max-width: 980px) {
+    .mx-grid {
+      grid-template-columns: 1fr;
+    }
+    .modal-content.modal-xl {
+      width: 94vw;
+      max-width: 94vw;
+      height: 88vh;
+    }
+  }
+
+  /* Cockpit modal — HUD left, conversation right. */
+  .modal-content.modal-cockpit {
+    width: 88vw;
+    max-width: 1320px;
+    height: 86vh;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* ── TOASTS ─────────────────────────────────────────────────────────────
+     The container is an ARIA live region (see NgToastHost). For an alerting
+     system a toast a screen reader never announces is a functional bug. -- */
+  .toast-container {
+    position: fixed;
+    top: 76px;
+    right: 24px;
+    z-index: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    pointer-events: auto;
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.97rem;
+    min-width: 280px;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: toastIn 0.3s ease-out;
+  }
+  .toast-success {
+    background: rgba(0, 255, 149, 0.1);
+    border: 1px solid rgba(0, 255, 149, 0.3);
+    color: var(--green);
+  }
+  .toast-error {
+    background: rgba(255, 59, 92, 0.1);
+    border: 1px solid rgba(255, 59, 92, 0.3);
+    color: var(--red-text);
+  }
+  .toast-info {
+    background: rgba(0, 224, 255, 0.16);
+    border: 1px solid rgba(0, 224, 255, 0.4);
+    color: var(--cyan);
+  }
+  .toast-warning {
+    background: rgba(255, 149, 0, 0.1);
+    border: 1px solid rgba(255, 149, 0, 0.3);
+    color: var(--orange);
+  }
+  .toast .toast-close {
+    margin-left: auto;
+    color: inherit;
+    opacity: 0.6;
+    cursor: pointer;
+  }
+  .toast .toast-close:hover {
+    opacity: 1;
+  }
+}

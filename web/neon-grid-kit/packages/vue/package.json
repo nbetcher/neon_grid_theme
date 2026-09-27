@@ -1,0 +1,13 @@
+{
+  "name": "@neon-grid/kit-vue",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Native Vue 3 and Nuxt components for the approved Neon Grid theme",
+  "files": ["src", "README.md"],
+  "exports": {".": "./src/index.ts", "./plugin": "./src/plugin.ts"},
+  "sideEffects": false,
+  "scripts": {"check": "vue-tsc --noEmit -p tsconfig.json", "build": "npm run check"},
+  "dependencies": {"@neon-grid/kit-core": "1.0.0"},
+  "peerDependencies": {"vue": "^3.5.0"},
+  "devDependencies": {"vue": "3.5.42", "typescript": "6.0.3", "vue-tsc": "3.3.11"}
+}

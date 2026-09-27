@@ -1,0 +1,7 @@
+{
+  "name": "@neon-grid/example-react",
+  "version": "1.0.0", "private": true, "type": "module",
+  "scripts": {"dev": "vite --host 127.0.0.1 --port 4311", "build": "tsc --noEmit && vite build", "typecheck": "tsc --noEmit", "preview": "vite preview --host 127.0.0.1 --port 4311"},
+  "dependencies": {"@neon-grid/kit-core": "1.0.0", "@neon-grid/kit-react": "1.0.0", "react": "19.2.8", "react-dom": "19.2.8"},
+  "devDependencies": {"@types/react": "19.2.18", "@types/react-dom": "19.2.7", "@vitejs/plugin-react": "6.1.1", "typescript": "6.0.3", "vite": "8.2.2"}
+}

@@ -1,0 +1,260 @@
+/* ============================================================================
+ * 95-a11y.css — the reduced-glow / high-contrast layer.
+ *
+ * The GLOW TOKEN SETS themselves live in 10-tokens.css (generated), because they
+ * are token values. What lives here is everything that is a RULE rather than a
+ * value: structural restoration under forced-colors, opaque fallbacks under
+ * reduced-transparency, and the idle-dim behaviour.
+ *
+ * ── WHY A GLOW CONTROL AT ALL ───────────────────────────────────────────────
+ * The `text-shadow: 0 0 6px currentColor` block in the source is a SAME-HUE
+ * glow: the shadow colour is closer to the foreground than to the background, so
+ * it effectively blurs the glyph edge — spending measured contrast to buy
+ * apparent brightness. On a #0a0a12 substrate with saturated #00e0ff glyphs that
+ * is the textbook setup for halation, and roughly half the population has some
+ * degree of astigmatism, which dark-mode pupil dilation amplifies. For an ops
+ * console someone stares at for hours this is the dominant long-session risk in
+ * the design — larger than any contrast-ratio number.
+ *
+ * The answer is NOT to remove the glow. The glow is the design. The answer is
+ * three levels, defaulting to `soft`, with the glyph glow gated separately from
+ * the box-shadow bloom — because the bloom on panels and pills is what carries
+ * the look, and the glyph glow is what costs legibility.
+ * ==========================================================================*/
+@layer neon.a11y {
+  /* Every rule that opts into the glyph glow reads the token, so all three
+     levels are handled by 10-tokens.css alone. This is the canonical list —
+     it deliberately EXCLUDES user-input text (.tron-input/.tron-textarea) and
+     content text (.issue-title, .sec-text, .df-value, .ng-transcript), which
+     must never glow. */
+  .btn,
+  .nav-btn,
+  .sev-chip,
+  .ix-chip,
+  .badge,
+  .panel-title,
+  .modal-title,
+  .section-divider,
+  .mini-label,
+  .issue-slug,
+  .event-ref,
+  .comment-author,
+  .tag-hex {
+    text-shadow: var(--glyph-glow);
+  }
+
+  /* ── HIGH CONTRAST (attribute or OS preference) ─────────────────────────
+     Token overrides are in 10-tokens.css; these are the structural changes. */
+  :root[data-contrast='high'] .panel,
+  :root[data-contrast='high'] .stat-card,
+  :root[data-contrast='high'] .kpi-tile,
+  :root[data-contrast='high'] .chart-panel,
+  :root[data-contrast='high'] .modal-content,
+  :root[data-contrast='high'] .tron-input,
+  :root[data-contrast='high'] .tron-select,
+  :root[data-contrast='high'] .tron-textarea {
+    border-width: var(--border-width);
+  }
+  /* The gradient hairline is nearly invisible at high contrast and its job is
+     decorative; a solid rule reads better. */
+  :root[data-contrast='high'] .panel::before,
+  :root[data-contrast='high'] .stat-card::before,
+  :root[data-contrast='high'] .chart-panel::before {
+    background: var(--cyan);
+    opacity: 1;
+  }
+  /* Gradient-clipped numerals lose too much at high contrast — go flat. */
+  :root[data-contrast='high'] .stat-value,
+  :root[data-contrast='high'] .kpi-value,
+  :root[data-contrast='high'] .rr-pct,
+  :root[data-contrast='high'] .logo-text {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--text-primary);
+    filter: none;
+  }
+
+  @media (prefers-contrast: more) {
+    :root:not([data-contrast='normal']) .panel::before,
+    :root:not([data-contrast='normal']) .stat-card::before,
+    :root:not([data-contrast='normal']) .chart-panel::before {
+      background: var(--cyan);
+      opacity: 1;
+    }
+    :root:not([data-contrast='normal']) .stat-value,
+    :root:not([data-contrast='normal']) .kpi-value,
+    :root:not([data-contrast='normal']) .rr-pct,
+    :root:not([data-contrast='normal']) .logo-text {
+      background: none;
+      -webkit-text-fill-color: currentColor;
+      color: var(--text-primary);
+      filter: none;
+    }
+  }
+
+  /* ── REDUCED TRANSPARENCY ───────────────────────────────────────────────
+     The theme leans on ~20 low-alpha fills. Under this preference they become
+     solid equivalents mixed against --bg-panel. `color-mix` keeps that to one
+     rule per fill instead of twenty hand-picked hexes. -------------------- */
+  @media (prefers-reduced-transparency: reduce) {
+    .modal-backdrop {
+      backdrop-filter: none;
+      background: rgba(0, 0, 0, 0.92);
+    }
+    .badge-success,
+    .toast-success {
+      background: color-mix(in srgb, var(--green) 12%, var(--bg-panel));
+    }
+    .badge-danger,
+    .toast-error {
+      background: color-mix(in srgb, var(--red) 12%, var(--bg-panel));
+    }
+    .badge-warning,
+    .toast-warning,
+    .approval-pill,
+    .auth-banner {
+      background: color-mix(in srgb, var(--orange) 12%, var(--bg-panel));
+    }
+    .badge-info,
+    .toast-info,
+    .plan-card {
+      background: color-mix(in srgb, var(--cyan) 14%, var(--bg-panel));
+    }
+    .badge-violet {
+      background: color-mix(in srgb, var(--violet) 14%, var(--bg-panel));
+    }
+    .badge-magenta {
+      background: color-mix(in srgb, var(--magenta) 14%, var(--bg-panel));
+    }
+    .btn-primary {
+      background: color-mix(in srgb, var(--cyan) 20%, var(--bg-panel));
+    }
+    .resolution-block {
+      background: color-mix(in srgb, var(--green) 8%, var(--bg-panel));
+    }
+    .grid-bg::after {
+      background: none;
+    }
+  }
+
+  /* ── WINDOWS HIGH CONTRAST (forced-colors) ──────────────────────────────
+     Relevant: this runs on a Windows box. forced-colors flattens colour-only
+     borders, and this design leans on them heavily, so structure has to be
+     restored explicitly. DATA colours are exempted with forced-color-adjust —
+     a severity bar whose segments all render the same colour is not an
+     accessibility win, it is a broken chart. ------------------------------ */
+  @media (forced-colors: active) {
+    .panel,
+    .stat-card,
+    .kpi-tile,
+    .chart-panel,
+    .modal-content,
+    .chip,
+    .badge,
+    .btn,
+    .tron-input,
+    .tron-select,
+    .tron-textarea,
+    .sev-chip,
+    .live-pill,
+    .status-pill,
+    .lifecycle-pill,
+    .counter-pill,
+    .worker-chip,
+    .triad-chip,
+    .glyph,
+    .ng-source-card,
+    .ng-record-row {
+      border: 1px solid CanvasText;
+    }
+    /* Gradient hairlines vanish in forced-colors anyway — remove the ghost. */
+    .panel::before,
+    .stat-card::before,
+    .chart-panel::before,
+    .modal-content::before {
+      display: none;
+    }
+    /* Keep DATA colour. */
+    .dist-bar .seg,
+    .sev-chip .ng-icon,
+    .issue-sev-dot,
+    .legend-dot,
+    .event-icon,
+    .hbar-fill,
+    .ng-prog-fill,
+    .cg-arc-fill,
+    .cg-arc-cache,
+    .rr-fill {
+      forced-color-adjust: none;
+    }
+    * {
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+    .grid-bg {
+      display: none;
+    }
+  }
+
+  /* ── IDLE DIM (burn-in + long-shift comfort) ────────────────────────────
+     Set by <NgAppShell> after N minutes with no input. Static neon panels on an
+     OLED/mini-LED wall display are a burn-in risk, and a console nobody is
+     looking at has no reason to be at full brightness. A 1px translate on the
+     wrapper shifts every static pixel. Any input clears it instantly. ---- */
+  :root[data-idle='true'] .app-wrapper {
+    filter: brightness(0.72) saturate(0.9);
+    transform: translate(1px, 1px);
+    transition: filter 1.2s ease, transform 1.2s ease;
+  }
+  :root[data-idle='true'] .grid-bg {
+    opacity: 0.5;
+  }
+  /* Never dim a modal — if one is open the operator is mid-task. */
+  :root[data-idle='true'] .modal-positioner,
+  :root[data-idle='true'] .toast-container {
+    filter: none;
+  }
+
+  /* ── PRINT ──────────────────────────────────────────────────────────────
+     An incident report printed from this console should be legible on paper. */
+  @media print {
+    .grid-bg,
+    .app-header,
+    .toast-container,
+    .panel-arc {
+      display: none !important;
+    }
+    body {
+      background: #fff;
+      color: #000;
+    }
+    .panel,
+    .stat-card,
+    .modal-content {
+      background: #fff;
+      border: 1px solid #666;
+      box-shadow: none;
+      break-inside: avoid;
+    }
+    .panel-title,
+    .modal-title,
+    .section-divider,
+    .mini-label,
+    .stat-label,
+    .form-label {
+      color: #000;
+      text-shadow: none;
+    }
+    .stat-value,
+    .kpi-value {
+      background: none;
+      -webkit-text-fill-color: #000;
+      color: #000;
+      filter: none;
+    }
+    * {
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+  }
+}

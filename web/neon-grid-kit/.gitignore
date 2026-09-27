@@ -1,0 +1,10 @@
+node_modules/
+**/dist/
+**/.next/
+**/.nuxt/
+**/.output/
+**/*.tsbuildinfo
+artifacts/browser-profile/
+artifacts/*.log
+!packages/core/dist/
+

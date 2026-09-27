@@ -1,0 +1,39 @@
+/* 00-reset.css — the minimum. Not normalize.css; the theme styles what it uses. */
+@layer neon.reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Media should never be the reason a panel overflows its grid track. */
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Controls inherit the theme's type instead of the UA's. */
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    background: none;
+    border: none;
+  }
+
+  /* petite-vue parity: v-cloak hides the pre-mount tree. Harmless in Nuxt and
+     kept so markup copied across from the showcase behaves identically. */
+  [v-cloak] {
+    display: none !important;
+  }
+}

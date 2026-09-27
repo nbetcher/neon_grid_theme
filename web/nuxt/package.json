@@ -1,0 +1,55 @@
+{
+  "name": "@neon-grid/nuxt",
+  "version": "1.0.0",
+  "description": "Neon Grid design system as a Nuxt 4 layer — tokens, CSS, Vue components, chart theming. Grid: yes. Scanlines: intentionally omitted.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./nuxt.config.ts",
+  "exports": {
+    ".": "./nuxt.config.ts",
+    "./tokens": "./shared/tokens.ts",
+    "./css": "./app/assets/css/index.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "app",
+    "public",
+    "shared",
+    "scripts",
+    "nuxt.config.ts",
+    "tsconfig.json",
+    "README.md",
+    "MIGRATION.md"
+  ],
+  "scripts": {
+    "dev": "nuxi dev playground",
+    "build": "nuxi build playground",
+    "preview": "nuxi preview playground",
+    "typecheck": "nuxi typecheck playground",
+    "tokens": "node scripts/gen-tokens-css.mjs",
+    "tokens:check": "node scripts/gen-tokens-css.mjs --check",
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "fonts:check": "node scripts/fetch-fonts.mjs --check",
+    "prepare": "npm run tokens"
+  },
+  "dependencies": {
+    "@iconify-json/ph": "^1.2.2",
+    "@nuxt/icon": "^2.5.0",
+    "chart.js": "^4.5.1",
+    "reka-ui": "^2.10.3"
+  },
+  "peerDependencies": {
+    "nuxt": "^4.5.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "nuxt": "4.5.2",
+    "typescript": "6.0.3",
+    "vue-tsc": "3.3.10"
+  },
+  "engines": {
+    "_comment": "23.6 is the floor because `prepare` -> `tokens` imports shared/tokens.ts DIRECTLY, which needs native TypeScript type-stripping. 22.6-23.5 can do it only behind --experimental-strip-types; below 22.6 the import throws ERR_UNKNOWN_FILE_EXTENSION and `npm install` fails. Do not lower this without also precompiling the token module.",
+    "node": ">=23.6.0"
+  }
+}

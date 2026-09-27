@@ -1,0 +1,15 @@
+{
+  "approvedOn": "2026-09-08",
+  "source": "F:\\Dev\\verde-watch\\docs\\mockups\\live-channels",
+  "decision": "Original padding and margins restored; original fonts <=12pt increased by 1pt.",
+  "files": {
+    "app.js": "72a8e053092b5d1467700465a8fd1a8fa541c20fce3a9a83ae5b2d7665915eeb",
+    "compact-preview.css": "82d5ea4e1e26d0853bf4f47fdbb5579eb18e80a654698ed4454c0004ff08e828",
+    "index.html": "e41dc7be8b72819cc26442610c9a5fc3b1b64ab89ef93dcf36a1fda57e07bc63",
+    "motion-preview.css": "c8f75d41107b3051292cab6cc9d9812c4dc0b31a51e60656d9348a1b86010c23",
+    "motion-preview.html": "7732e946741b56931c8199fb40d0861f8baa481e8fd9c10245c94029221205b9",
+    "motion-preview.js": "76312a2c1e59d85e7e9a66bfd0ea3f1ddfb658eb47d631e63c822897a98c11d4",
+    "neon-grid.css": "8dc547a3636e4818e90b1c7ce79b656c30d56408e806503f549b92c2c1ef7fdf",
+    "styles.css": "eec17685195f09a441ef9eeae802821fda49d762d878476ebf9934f8dada0fef"
+  }
+}
